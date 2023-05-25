@@ -1,3 +1,3 @@
 [submodule "test-lists"]
-	path = test-lists
+	path = data
 	url = https://github.com/citizenlab/test-lists.git
