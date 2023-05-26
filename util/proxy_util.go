@@ -5,6 +5,13 @@ import (
 	"strconv"
 )
 
+func SetProxy(ip string, port int, username string, password string) {
+	config.ProxyIP = ip
+	config.ProxyPort = strconv.Itoa(port)
+	config.ProxyUsername = username
+	config.ProxyPassword = password
+}
+
 func ParseProxyFull(remoteDNS bool) string {
 	result := "socks5"
 
@@ -23,7 +30,7 @@ func ParseProxyFull(remoteDNS bool) string {
 
 	result += config.ProxyIP
 	result += ":"
-	result += strconv.Itoa(config.ProxyPort)
+	result += config.ProxyPort
 
 	return result
 }
@@ -31,7 +38,7 @@ func ParseProxyFull(remoteDNS bool) string {
 func ParseProxy() string {
 	result := config.ProxyIP
 	result += ":"
-	result += strconv.Itoa(config.ProxyPort)
+	result += config.ProxyPort
 
 	return result
 }

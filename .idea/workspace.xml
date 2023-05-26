@@ -5,15 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/testers/ip/port.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/ip_resolver.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/residual_detector.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Shawshank.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Shawshank.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/detect_residual.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/proxy.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/proxy_parser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/ip/port.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/ip/port.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/proxy_parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/proxy_util.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +27,9 @@
   <component name="GOROOT" url="file:///usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GoLibraries">
+    <option name="indexEntireGoPath" value="true" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -57,7 +57,8 @@
     "go.import.settings.migrated": "true",
     "last_opened_file_path": "/Users/pywchung/go/Shawshank",
     "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)"
+    "node.js.selected.package.eslint": "(autodetect)",
+    "settings.editor.selected.configurable": "go.vgo"
   },
   "keyToStringList": {
     "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
@@ -97,8 +98,18 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VgoProject">
-    <integration-enabled>false</integration-enabled>
     <settings-migrated>true</settings-migrated>
   </component>
 </project>

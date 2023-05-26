@@ -1,8 +1,8 @@
 package main
 
 import (
-	"./testers/ip"
 	"fmt"
+	"github.com/pywc/shawshank_intel/testers/ip"
 )
 
 func main() {

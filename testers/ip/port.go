@@ -1,9 +1,11 @@
 package ip
 
 import (
-	"../../util"
+	"github.com/pywc/shawshank_intel/util"
+	"golang.org/x/net/proxy"
 	"log"
 	"net"
+	"strconv"
 )
 
 func TestPort(ip string, port int) int {
@@ -13,7 +15,7 @@ func TestPort(ip string, port int) int {
 		return -1
 	}
 
-	conn, err := dialer.Dial("tcp", net.JoinHostPort(ip, port))
+	conn, err := dialer.Dial("tcp", net.JoinHostPort(ip, strconv.Itoa(port)))
 	if err != nil {
 		log.Fatal("Failed to connect to the destination:", err)
 		return 1
