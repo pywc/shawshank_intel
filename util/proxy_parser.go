@@ -5,8 +5,8 @@ import (
 	"strconv"
 )
 
-func parse_proxy(remoteDNS bool) string {
-	var result string = "socks5"
+func ParseProxyFull(remoteDNS bool) string {
+	result := "socks5"
 
 	if remoteDNS == true {
 		result += "h://"
@@ -22,6 +22,14 @@ func parse_proxy(remoteDNS bool) string {
 	}
 
 	result += config.ProxyIP
+	result += ":"
+	result += strconv.Itoa(config.ProxyPort)
+
+	return result
+}
+
+func ParseProxy() string {
+	result := config.ProxyIP
 	result += ":"
 	result += strconv.Itoa(config.ProxyPort)
 
