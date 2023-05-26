@@ -1,4 +1,4 @@
-package ip
+package ip_tester
 
 import (
 	"github.com/pywc/shawshank_intel/util"

@@ -1,7 +1,7 @@
 package util
 
 import (
-	"../config"
+	"github.com/pywc/shawshank_intel/config"
 	"strconv"
 )
 
