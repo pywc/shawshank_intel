@@ -1,4 +1,4 @@
-module Shawshank
+module shawshank_intel
 
 go 1.20
 
