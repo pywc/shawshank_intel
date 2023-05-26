@@ -5,13 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/connection.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/ip/port.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/ip_tester/00_port.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/proxy_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/proxy_util.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/connection.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/connection.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
