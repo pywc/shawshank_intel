@@ -1,4 +1,4 @@
-module shawshank_intel
+module github.com/pywc/shawshank_intel
 
 go 1.20
 
