@@ -5,16 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testers/http_tester/02_html_title.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testers/http_tester/sender.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/https_tester/sender.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/geolocator.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/throttle_helper.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/residual_detector.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/residual_detector.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/ip_tester/00_port.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/ip_tester/00_port.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/proxy_util.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/proxy_tools.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +80,7 @@
       <recent name="$PROJECT_DIR$/util" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build main.go">
+  <component name="RunManager" selected="Go Build.go build test.go">
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
       <module name="Shawshank" />
       <working_directory value="$PROJECT_DIR$" />

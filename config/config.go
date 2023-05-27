@@ -1,10 +1,17 @@
 package config
 
+// Global Configuration
+var TestCount = 30
+
 // SOCKS5 Proxy Configuration
-var ProxyIP string = "35.188.143.33"
-var ProxyPort string = "2408"
-var ProxyUsername string = ""
-var ProxyPassword string = ""
+var ProxyIP = "35.188.143.33"
+var ProxyPort = "2408"
+var ProxyUsername = ""
+var ProxyPassword = ""
+
+// Throttle Test Configuration
+var ThrottlePValThreshold = 0.01
+var TDigestCompression float64 = 1000
 
 // HTTP Test Configuration
 var EchoServerAddr string = "35.188.143.33"

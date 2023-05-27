@@ -23,13 +23,11 @@ func CheckHTTPHeaderHost(domain string) []FilteredHeaderHost {
 		req += "magicWord=" + url.QueryEscape(config.MagicWord)
 		resultCode, resp, redirectURL := SendHTTPRequest(config.EchoServerAddr, config.EchoServerAddr, config.EchoServerPort, req)
 
-		if resultCode == 0 {
-			continue
-		}
-
-		if !strings.Contains(resp, config.MagicWord) {
+		if resultCode == 0 && !strings.Contains(resp, config.MagicWord) {
 			resultCode = 399
 			redirectURL = "unknown"
+		} else if resultCode == 0 {
+			continue
 		}
 
 		filtered := FilteredHeaderHost{
