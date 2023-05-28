@@ -5,17 +5,7 @@ import (
 	"log"
 )
 
-// CheckHTTPSConnectivity
-/*
-	-3: unhandled error
-	-2: proxy error
-	-1: not accessible in the US
-	0: success
-	1: reset
-	2: refused
-	3: silent drop
-	4: TODO: throttle
-*/
+// CheckHTTPSConnectivity Check basic HTTPS connectivity to the domain
 func CheckHTTPSConnectivity(domain string, ip string) int {
 	// request configuration
 	req := "GET / HTTP/1.1\r\nHost: " + domain + "\r\n\r\n"
