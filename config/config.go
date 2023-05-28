@@ -13,13 +13,21 @@ var ProxyPassword = ""
 var ThrottlePValThreshold = 0.01
 var TDigestCompression float64 = 1000
 
+// Residual Test Configuration
+var ResidualTestThreshold float64 = 600
+
 // HTTP Test Configuration
 var EchoServerAddr string = "35.188.143.33"
 var EchoServerPort int = 8008
 var MagicWord string = "somethingsSpeciale"
 
-func HTTPHostWildcards(domain string) []string {
-	testList := make([]string, 0)
+// HTTPS Test Configuration
+var DummyServerDomain = "wisc.edu"
+var DummyServerIP = "144.92.9.70"
+
+// For both HTTP and HTTPS
+func DomainWildcards(domain string) []string {
+	testList := make([]string, 7)
 	testList = append(testList, domain)
 	testList = append(testList, "abc123qwezxc."+domain)
 	testList = append(testList, "*."+domain)

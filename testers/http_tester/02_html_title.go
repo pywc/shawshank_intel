@@ -3,6 +3,7 @@ package http_tester
 import (
 	"github.com/pywc/shawshank_intel/config"
 	"golang.org/x/net/html"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -50,7 +51,10 @@ func CheckHTMLTitle(domain string) (int, string) {
 	html := "<html><head><title>" + title + "</title></head><body>" + config.MagicWord + "</body></html>"
 	req := "POST / HTTP/1.1\r\nHost: " + config.EchoServerAddr + "\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"
 	req += "magicWord=" + url.QueryEscape(html)
-	resultCode, respEcho, redirectURL := SendHTTPRequest(config.EchoServerAddr, config.EchoServerAddr, config.EchoServerPort, req)
+	resultCode, respEcho, redirectURL, err := SendHTTPRequest(config.EchoServerAddr, config.EchoServerAddr, config.EchoServerPort, req)
+	if resultCode == -10 {
+		log.Println("[*] Error - " + domain + " - " + err.Error())
+	}
 
 	if resultCode == 0 && !strings.Contains(respEcho, config.MagicWord) {
 		resultCode = 399

@@ -5,6 +5,7 @@ import (
 	"github.com/pywc/shawshank_intel/config"
 	"golang.org/x/exp/slices"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -47,7 +48,10 @@ func CheckHTMLTokens(domain string) ([]FilteredTokens, error) {
 	for _, token := range testList {
 		req := "POST / HTTP/1.1\r\nHost: " + config.EchoServerAddr + "\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"
 		req += "magicWord=" + url.QueryEscape(token)
-		resultCode, resp, redirectURL := SendHTTPRequest(config.EchoServerAddr, config.EchoServerAddr, config.EchoServerPort, req)
+		resultCode, resp, redirectURL, err := SendHTTPRequest(config.EchoServerAddr, config.EchoServerAddr, config.EchoServerPort, req)
+		if resultCode == -10 {
+			log.Println("[*] Error - " + domain + " - " + err.Error())
+		}
 
 		if resultCode == 0 && !strings.Contains(resp, token) {
 			resultCode = 399
