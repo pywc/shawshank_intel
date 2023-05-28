@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"golang.org/x/net/proxy"
 	"io"
-	"log"
 	"net"
 	"strconv"
 	"strings"
@@ -90,6 +89,7 @@ func readResponseBody(reader *bufio.Reader, contentLength int64) (string, error)
 	return string(body), nil
 }
 
+// ConnectNormally Connect to the address normally
 func ConnectNormally(addr string, port int) (net.Conn, error) {
 	// Connect to the SOCKS5 proxy
 	conn, err := net.Dial("tcp", net.JoinHostPort(addr, strconv.Itoa(port)))
@@ -101,6 +101,7 @@ func ConnectNormally(addr string, port int) (net.Conn, error) {
 	return conn, nil
 }
 
+// ConnectViaProxy Connect to the address through the proxy
 func ConnectViaProxy(addr string, port int) (net.Conn, error) {
 	// Create a SOCKS5 proxy dialer
 	dialer, err := proxy.SOCKS5("tcp", ParseProxy(), nil, proxy.Direct)
@@ -119,6 +120,7 @@ func ConnectViaProxy(addr string, port int) (net.Conn, error) {
 	return proxyConn, nil
 }
 
+// SendHTTPTraffic Send HTTP GET request and get response
 func SendHTTPTraffic(conn net.Conn, request string) (string, error) {
 	_, err := conn.Write([]byte(request))
 	if err != nil {
@@ -132,7 +134,7 @@ func SendHTTPTraffic(conn net.Conn, request string) (string, error) {
 	for {
 		packet, err := reader.ReadString('\n')
 		if err != nil {
-			log.Fatal("Failed to read response packet:", err)
+			return "", err
 		}
 		respHeader += packet
 
@@ -162,7 +164,10 @@ func SendHTTPTraffic(conn net.Conn, request string) (string, error) {
 	return respHeader + respBody, nil
 }
 
+// SendHTTPSTraffic Send HTTP GET request with TLS and get response
 func SendHTTPSTraffic(conn net.Conn, request string, tlsConfig *tls.Config) (string, error) {
+	// TODO: return session ticket
+
 	// Create a TLS connection over the proxy connection
 	tlsConn := tls.Client(conn, tlsConfig)
 
@@ -172,7 +177,7 @@ func SendHTTPSTraffic(conn net.Conn, request string, tlsConfig *tls.Config) (str
 	// Perform the TLS handshake
 	err := tlsConn.Handshake()
 	if err != nil {
-		fmt.Println("TLS handshake failed:", err)
+		return "", err
 	}
 
 	// Reset the deadline
@@ -180,7 +185,6 @@ func SendHTTPSTraffic(conn net.Conn, request string, tlsConfig *tls.Config) (str
 
 	_, err = tlsConn.Write([]byte(request))
 	if err != nil {
-		fmt.Println("Failed to send HTTP request:", err)
 		return "", err
 	}
 
@@ -190,7 +194,7 @@ func SendHTTPSTraffic(conn net.Conn, request string, tlsConfig *tls.Config) (str
 	for {
 		packet, err := reader.ReadString('\n')
 		if err != nil {
-			log.Fatal("Failed to read response packet:", err)
+			return "", err
 		}
 		respHeader += packet
 

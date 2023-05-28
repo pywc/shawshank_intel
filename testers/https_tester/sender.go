@@ -18,6 +18,7 @@ import (
 	2: refused
 	3: silent drop
 	4: TODO: throttle
+	5: invalid certificate
 */
 func SendHTTPSRequest(domain string, ip string, port int, req string, tlsConfig *tls.Config) (int, string, error) {
 	// Fetch via proxy
@@ -54,6 +55,8 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, tlsConfig 
 		} else if strings.Contains(err.Error(), "i/o timeout") {
 			// connection timeout
 			return 3, "", nil
+		} else if strings.Contains(err.Error(), "failed to verify certificate") {
+			return 5, "", nil
 		} else {
 			// unknown error
 			return -10, "", err
