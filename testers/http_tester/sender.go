@@ -2,7 +2,6 @@ package http_tester
 
 import (
 	"bufio"
-	"fmt"
 	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/util"
 	"net/http"
@@ -28,22 +27,22 @@ import (
 	4xx: not accessible
 	5xx: internal server error
 */
-func SendHTTPRequest(domain string, ip string, port int, req string) (int, string, string) {
+func SendHTTPRequest(domain string, ip string, port int, req string) (int, string, string, error) {
 	// Fetch Normally
 	conn, err := util.ConnectNormally(ip, port)
 	if err != nil {
 		// echo server is not functional
 		if ip == config.EchoServerAddr {
-			return -9, "", ""
+			return -9, "", "", nil
 		}
 
 		// IP is not accessible from the US
-		return -2, "", ""
+		return -2, "", "", err
 	}
 	resp, err := util.SendHTTPTraffic(conn, req)
 	conn.Close()
 	if err != nil {
-		return -3, "", ""
+		return -3, "", "", err
 	}
 
 	// Fetch via proxy
@@ -51,14 +50,13 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 	if err != nil {
 		if strings.Contains(err.Error(), "general SOCKS server failure") {
 			// cannot connect to proxy
-			return -1, "", ""
+			return -1, "", "", nil
 		} else if ip == config.EchoServerAddr {
 			// residual censorship detection mode
-			util.DetectResidual(domain, ip)
+			util.DetectResidual(domain, ip, port)
 		} else {
 			// unknown error
-			fmt.Println(err.Error())
-			return -10, "", ""
+			return -10, "", "", err
 		}
 	}
 
@@ -69,17 +67,16 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 	if err != nil {
 		if strings.Contains(err.Error(), "connection reset by peer") {
 			// connection reset
-			return 1, "", ""
+			return 1, "", "", nil
 		} else if strings.Contains(err.Error(), "connection refused") {
 			// connection refused
-			return 2, "", ""
+			return 2, "", "", nil
 		} else if strings.Contains(err.Error(), "i/o timeout") {
 			// connection timeout
-			return 3, "", ""
+			return 3, "", "", nil
 		} else {
 			// unknown error
-			fmt.Println(err.Error())
-			return -10, "", ""
+			return -10, "", "", nil
 		}
 	}
 
@@ -87,38 +84,38 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 	reader := bufio.NewReader(strings.NewReader(resp))
 	respObj, err := http.ReadResponse(reader, nil)
 	if err != nil {
-		return -10, "", ""
+		return -10, "", "", err
 	}
 	resultCode := respObj.StatusCode
 
-	// check 4xx - 5xx
-	if resultCode >= 300 {
-		return resultCode, resp, ""
-	}
+	if resultCode >= 400 {
+		// check 4xx - 5xx
+		return resultCode, resp, "", nil
+	} else if resultCode >= 300 {
+		// check redirection
+		redirectURL := respObj.Header["Location"][0]
+		if redirectURL != "" {
+			urlCompare, _ := url2.Parse(redirectURL)
+			urlOriginElements := strings.Split(domain, ".")
+			urlCompareElements := strings.Split(urlCompare.Host, ".")
 
-	// check redirection
-	redirectURL := respObj.Header["Location"][0]
-	if redirectURL != "" {
-		urlCompare, _ := url2.Parse(redirectURL)
-		urlOriginElements := strings.Split(domain, ".")
-		urlCompareElements := strings.Split(urlCompare.Host, ".")
+			intersection := make(map[string]bool)
+			for _, element := range urlOriginElements {
+				intersection[element] = true
+			}
 
-		intersection := make(map[string]bool)
-		for _, element := range urlOriginElements {
-			intersection[element] = true
-		}
+			var result []string
+			for _, element := range urlCompareElements {
+				if intersection[element] {
+					result = append(result, element)
+				}
+			}
 
-		var result []string
-		for _, element := range urlCompareElements {
-			if intersection[element] {
-				result = append(result, element)
+			if len(result) < 2 {
+				return respObj.StatusCode, resp, redirectURL, nil
 			}
 		}
-
-		if len(result) < 2 {
-			return respObj.StatusCode, resp, redirectURL
-		}
 	}
 
-	return 0, resp, ""
+	return 0, resp, "", nil
 }

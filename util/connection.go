@@ -1,13 +1,94 @@
 package util
 
 import (
+	"bufio"
 	"crypto/tls"
 	"fmt"
 	"golang.org/x/net/proxy"
+	"io"
+	"log"
 	"net"
 	"strconv"
+	"strings"
 	"time"
 )
+
+// Parse the Content-Length header from the response headers
+func getContentLength(headers string) int64 {
+	lines := strings.Split(headers, "\r\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "Content-Length:") {
+			value := strings.TrimSpace(line[len("Content-Length:"):])
+			length, err := strconv.ParseInt(value, 10, 64)
+			if err == nil {
+				return length
+			}
+		}
+	}
+	return 0
+}
+
+// Check if the response is chunked encoded
+func isChunkedEncoding(headers string) bool {
+	lines := strings.Split(headers, "\r\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "Transfer-Encoding:") {
+			value := strings.TrimSpace(line[len("Transfer-Encoding:"):])
+			return strings.ToLower(value) == "chunked"
+		}
+	}
+	return false
+}
+
+// Read the response body when it is chunked encoded
+func readChunkedBody(reader *bufio.Reader) (string, error) {
+	body := ""
+	for {
+		// Read the chunk size
+		sizeLine, err := reader.ReadString('\n')
+		if err != nil {
+			return "", err
+		}
+		sizeLine = strings.TrimSpace(sizeLine)
+		chunkSize, err := strconv.ParseInt(sizeLine, 16, 64)
+		if err != nil {
+			return "", err
+		}
+
+		if chunkSize == 0 {
+			// Reached the end of chunked response
+			break
+		}
+
+		// Read the chunk data
+		chunk := make([]byte, chunkSize)
+		_, err = io.ReadFull(reader, chunk)
+		if err != nil {
+			return "", err
+		}
+
+		// Append the chunk data to the body
+		body += string(chunk)
+
+		// Read the CRLF after the chunk data
+		_, err = reader.ReadString('\n')
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return body, nil
+}
+
+// Read the response body when it has a known length
+func readResponseBody(reader *bufio.Reader, contentLength int64) (string, error) {
+	body := make([]byte, contentLength)
+	_, err := io.ReadFull(reader, body)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
+}
 
 func ConnectNormally(addr string, port int) (net.Conn, error) {
 	// Connect to the SOCKS5 proxy
@@ -45,20 +126,45 @@ func SendHTTPTraffic(conn net.Conn, request string) (string, error) {
 		return "", err
 	}
 
-	// Example: Read the HTTP response
-	buffer := make([]byte, 100000)
-	n, err := conn.Read(buffer)
-	if err != nil {
-		fmt.Println("Failed to read HTTP response:", err)
-		return "", err
+	// Read the response header
+	respHeader := ""
+	reader := bufio.NewReader(conn)
+	for {
+		packet, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal("Failed to read response packet:", err)
+		}
+		respHeader += packet
+
+		// Check if the response headers are complete
+		if strings.TrimSpace(packet) == "" {
+			break
+		}
 	}
 
-	return string(buffer[:n]), nil
+	// Read the response body
+	isChunked := isChunkedEncoding(respHeader)
+	respBody := ""
+	if isChunked {
+		respBody, err = readChunkedBody(reader)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		// Read the response body with Content-Length header
+		contentLength := getContentLength(respHeader)
+		respBody, err = readResponseBody(reader, contentLength)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return respHeader + respBody, nil
 }
 
-func SendHTTPSTraffic(conn net.Conn, request string, tlsConfig tls.Config) (string, error) {
+func SendHTTPSTraffic(conn net.Conn, request string, tlsConfig *tls.Config) (string, error) {
 	// Create a TLS connection over the proxy connection
-	tlsConn := tls.Client(conn, &tlsConfig)
+	tlsConn := tls.Client(conn, tlsConfig)
 
 	// Set a timeout for the TLS handshake
 	tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
@@ -78,13 +184,38 @@ func SendHTTPSTraffic(conn net.Conn, request string, tlsConfig tls.Config) (stri
 		return "", err
 	}
 
-	// Example: Read the HTTP response
-	buffer := make([]byte, 100000)
-	n, err := tlsConn.Read(buffer)
-	if err != nil {
-		fmt.Println("Failed to read HTTP response:", err)
-		return "", err
+	// Read the response header
+	respHeader := ""
+	reader := bufio.NewReader(tlsConn)
+	for {
+		packet, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal("Failed to read response packet:", err)
+		}
+		respHeader += packet
+
+		// Check if the response headers are complete
+		if strings.TrimSpace(packet) == "" {
+			break
+		}
 	}
 
-	return string(buffer[:n]), nil
+	// Read the response body
+	isChunked := isChunkedEncoding(respHeader)
+	respBody := ""
+	if isChunked {
+		respBody, err = readChunkedBody(reader)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		// Read the response body with Content-Length header
+		contentLength := getContentLength(respHeader)
+		respBody, err = readResponseBody(reader, contentLength)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return respHeader + respBody, nil
 }
