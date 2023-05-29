@@ -1,8 +1,8 @@
 package https_tester
 
 import (
-	"crypto/tls"
 	"github.com/pywc/shawshank_intel/config"
+	utls "github.com/refraction-networking/utls"
 	"log"
 )
 
@@ -17,10 +17,10 @@ func CheckSNI(domain string, ip string) (int, []FilteredSNI) {
 
 	for _, testDomain := range testList {
 		req := "POST / HTTP/1.1\r\nHost: " + domain + "\r\n\r\n"
-		tlsConfig := tls.Config{
+		utlsConfig := utls.Config{
 			ServerName: testDomain,
 		}
-		resultCode, _, err := SendHTTPSRequest(config.DummyServerDomain, config.DummyServerIP, 443, req, &tlsConfig)
+		resultCode, _, err := SendHTTPSRequest(config.DummyServerDomain, config.DummyServerIP, 443, req, &utlsConfig)
 
 		if resultCode == 0 {
 			continue
