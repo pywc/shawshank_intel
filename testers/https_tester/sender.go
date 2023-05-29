@@ -1,9 +1,9 @@
 package https_tester
 
 import (
-	"crypto/tls"
 	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/util"
+	utls "github.com/refraction-networking/utls"
 	"strings"
 )
 
@@ -20,7 +20,7 @@ import (
 	4: TODO: throttle
 	5: invalid certificate
 */
-func SendHTTPSRequest(domain string, ip string, port int, req string, tlsConfig *tls.Config) (int, string, error) {
+func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig *utls.Config) (int, string, error) {
 	// Fetch via proxy
 	conn, err := util.ConnectViaProxy(ip, port)
 
@@ -41,7 +41,7 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, tlsConfig 
 		}
 	}
 
-	resp, err := util.SendHTTPSTraffic(conn, req, tlsConfig)
+	resp, err := util.SendHTTPSTraffic(conn, req, utlsConfig)
 	conn.Close()
 
 	// check tcp errors
@@ -55,7 +55,7 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, tlsConfig 
 		} else if strings.Contains(err.Error(), "i/o timeout") {
 			// connection timeout
 			return 3, "", nil
-		} else if strings.Contains(err.Error(), "failed to verify certificate") {
+		} else if strings.Contains(err.Error(), "certificate is valid for") {
 			return 5, "", nil
 		} else {
 			// unknown error

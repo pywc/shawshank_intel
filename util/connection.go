@@ -2,8 +2,8 @@ package util
 
 import (
 	"bufio"
-	"crypto/tls"
 	"fmt"
+	utls "github.com/refraction-networking/utls"
 	"golang.org/x/net/proxy"
 	"io"
 	"net"
@@ -165,11 +165,11 @@ func SendHTTPTraffic(conn net.Conn, request string) (string, error) {
 }
 
 // SendHTTPSTraffic Send HTTP GET request with TLS and get response
-func SendHTTPSTraffic(conn net.Conn, request string, tlsConfig *tls.Config) (string, error) {
+func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config) (string, error) {
 	// TODO: return session ticket
 
 	// Create a TLS connection over the proxy connection
-	tlsConn := tls.Client(conn, tlsConfig)
+	tlsConn := utls.Client(conn, utlsConfig)
 
 	// Set a timeout for the TLS handshake
 	tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
