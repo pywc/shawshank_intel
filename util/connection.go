@@ -169,7 +169,7 @@ func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config) (s
 	// TODO: return session ticket
 
 	// Create a TLS connection over the proxy connection
-	tlsConn := utls.Client(conn, utlsConfig)
+	tlsConn := utls.UClient(conn, utlsConfig, utls.HelloGolang)
 
 	// Set a timeout for the TLS handshake
 	tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
