@@ -16,9 +16,14 @@ func CheckSNI(domain string, ip string) (int, []FilteredSNI) {
 	filteredList := make([]FilteredSNI, len(testList))
 
 	for _, testDomain := range testList {
-		req := "POST / HTTP/1.1\r\nHost: " + domain + "\r\n\r\n"
+		req := "GET / HTTP/1.1\r\n" +
+			"Host: " + domain + "\r\n" +
+			"Accept: */*\r\n" +
+			"User-Agent: " + config.UserAgent + "\r\n\r\n"
+
 		utlsConfig := utls.Config{
-			ServerName: testDomain,
+			InsecureSkipVerify: true,
+			ServerName:         testDomain,
 		}
 		resultCode, _, err := SendHTTPSRequest(config.DummyServerDomain, config.DummyServerIP, 443, req, &utlsConfig)
 

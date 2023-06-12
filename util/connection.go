@@ -2,7 +2,9 @@ package util
 
 import (
 	"bufio"
+	"crypto/x509"
 	"fmt"
+	"github.com/pywc/shawshank_intel/config"
 	utls "github.com/refraction-networking/utls"
 	"golang.org/x/net/proxy"
 	"io"
@@ -183,6 +185,139 @@ func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config) (s
 	// Reset the deadline
 	tlsConn.SetDeadline(time.Time{})
 
+	_, err = tlsConn.Write([]byte(request))
+	if err != nil {
+		return "", err
+	}
+
+	// Read the response header
+	respHeader := ""
+	reader := bufio.NewReader(tlsConn)
+	for {
+		packet, err := reader.ReadString('\n')
+		if err != nil {
+			return "", err
+		}
+		respHeader += packet
+
+		// Check if the response headers are complete
+		if strings.TrimSpace(packet) == "" {
+			break
+		}
+	}
+
+	// Read the response body
+	isChunked := isChunkedEncoding(respHeader)
+	respBody := ""
+	if isChunked {
+		respBody, err = readChunkedBody(reader)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		// Read the response body with Content-Length header
+		contentLength := getContentLength(respHeader)
+		respBody, err = readResponseBody(reader, contentLength)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	// TODO: Change after implementing session ticket
+	return respHeader + respBody, nil
+}
+
+type TLSSession struct {
+	version      uint16
+	cipherSuite  uint16
+	ID           []byte
+	masterSecret []byte
+	serverCerts  []*x509.Certificate
+}
+
+// GetNewTLSSession
+func GetNewTLSSession(conn net.Conn, request string, utlsConfig *utls.Config) (*TLSSession, error) {
+	sess := TLSSession{}
+
+	// Create a TLS connection over the proxy connection
+	tlsConn := utls.UClient(conn, utlsConfig, utls.HelloGolang)
+
+	err := tlsConn.BuildHandshakeState()
+	if err != nil {
+		return nil, err
+	}
+
+	tlsConn.HandshakeState.Hello.SessionId = nil
+
+	// Set a timeout for the TLS handshake
+	tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
+
+	// Perform the TLS handshake
+	err = tlsConn.Handshake()
+	if err != nil {
+		return nil, err
+	}
+
+	// Reset the deadline
+	tlsConn.SetDeadline(time.Time{})
+
+	_, err = tlsConn.Write([]byte(request))
+	if err != nil {
+		return nil, err
+	}
+
+	state := tlsConn.HandshakeState
+
+	sess.version = state.ServerHello.Vers
+	sess.cipherSuite = state.ServerHello.CipherSuite
+	sess.ID = state.ServerHello.SessionId
+	sess.masterSecret = state.MasterSecret
+	sess.serverCerts = tlsConn.ConnectionState().PeerCertificates
+
+	return &sess, nil
+}
+
+// ResumeTLSSession
+func ResumeTLSSession(conn net.Conn, request string, sess TLSSession) (string, error) {
+	utlsConfig := utls.Config{
+		ServerName:         config.DummyServerDomain,
+		InsecureSkipVerify: true,
+		MinVersion:         utls.VersionTLS12,
+		MaxVersion:         utls.VersionTLS12,
+	}
+
+	// Create a TLS connection over the proxy connection
+	tlsConn := utls.UClient(conn, &utlsConfig, utls.HelloGolang)
+
+	// Set Session ID and State
+	state := utls.MakeClientSessionState(
+		nil,
+		sess.version,
+		sess.cipherSuite,
+		sess.masterSecret,
+		sess.serverCerts,
+		nil,
+	)
+
+	tlsConn.HandshakeState.Hello.SessionId = sess.ID
+	err := tlsConn.SetSessionState(state)
+	if err != nil {
+		return "", err
+	}
+
+	// Set a timeout for the TLS handshake
+	tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
+
+	// Perform the TLS handshake
+	err = tlsConn.Handshake()
+	if err != nil {
+		return "", err
+	}
+
+	// Reset the deadline
+	tlsConn.SetDeadline(time.Time{})
+
+	// Send HTTP request
 	_, err = tlsConn.Write([]byte(request))
 	if err != nil {
 		return "", err
