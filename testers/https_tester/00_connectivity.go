@@ -1,6 +1,7 @@
 package https_tester
 
 import (
+	"github.com/pywc/shawshank_intel/config"
 	utls "github.com/refraction-networking/utls"
 	"log"
 )
@@ -8,7 +9,11 @@ import (
 // CheckHTTPSConnectivity Check basic HTTPS connectivity to the domain
 func CheckHTTPSConnectivity(domain string, ip string) int {
 	// request configuration
-	req := "GET / HTTP/1.1\r\nHost: " + domain + "\r\n\r\n"
+	req := "GET / HTTP/1.1\r\n" +
+		"Host: " + domain + "\r\n" +
+		"Accept: */*\r\n" +
+		"User-Agent: " + config.UserAgent + "\r\n\r\n"
+
 	utlsConfig := utls.Config{
 		ServerName: domain,
 	}
