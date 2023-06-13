@@ -24,6 +24,8 @@ var MagicWord string = "somethingsSpeciale"
 // HTTPS Test Configuration
 var DummyServerDomain = "wisc.edu"
 var DummyServerIP = "144.92.9.70"
+var ESNIDomain = "www.cloudflare.com"
+var ESNIIP = "104.16.123.96"
 
 // For both HTTP and HTTPS
 func DomainWildcards(domain string) []string {
