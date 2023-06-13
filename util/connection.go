@@ -168,8 +168,6 @@ func SendHTTPTraffic(conn net.Conn, request string) (string, error) {
 
 // SendHTTPSTraffic Send HTTP GET request with TLS and get response
 func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config) (string, error) {
-	// TODO: return session ticket
-
 	// Create a TLS connection over the proxy connection
 	tlsConn := utls.UClient(conn, utlsConfig, utls.HelloGolang)
 
@@ -223,7 +221,68 @@ func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config) (s
 		}
 	}
 
-	// TODO: Change after implementing session ticket
+	return respHeader + respBody, nil
+}
+
+// SendHTTPSTrafficCustom Send HTTP GET request with TLS and get response
+func SendHTTPSTrafficCustom(conn net.Conn, request string, chloSpec *utls.ClientHelloSpec) (string, error) {
+	// Create a TLS connection over the proxy connection
+	tlsConn := utls.UClient(conn, &utls.Config{InsecureSkipVerify: true}, utls.HelloCustom)
+
+	fmt.Println(chloSpec.CipherSuites)
+
+	tlsConn.ApplyPreset(chloSpec)
+
+	// Set a timeout for the TLS handshake
+	tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
+
+	// Perform the TLS handshake
+	err := tlsConn.Handshake()
+	if err != nil {
+		return "", err
+	}
+
+	// Reset the deadline
+	tlsConn.SetDeadline(time.Time{})
+
+	_, err = tlsConn.Write([]byte(request))
+	if err != nil {
+		return "", err
+	}
+
+	// Read the response header
+	respHeader := ""
+	reader := bufio.NewReader(tlsConn)
+	for {
+		packet, err := reader.ReadString('\n')
+		if err != nil {
+			return "", err
+		}
+		respHeader += packet
+
+		// Check if the response headers are complete
+		if strings.TrimSpace(packet) == "" {
+			break
+		}
+	}
+
+	// Read the response body
+	isChunked := isChunkedEncoding(respHeader)
+	respBody := ""
+	if isChunked {
+		respBody, err = readChunkedBody(reader)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		// Read the response body with Content-Length header
+		contentLength := getContentLength(respHeader)
+		respBody, err = readResponseBody(reader, contentLength)
+		if err != nil {
+			return "", err
+		}
+	}
+
 	return respHeader + respBody, nil
 }
 

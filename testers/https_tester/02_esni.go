@@ -1,3 +1,154 @@
 package https_tester
 
-// TODO: ESNI
+import (
+	"github.com/pywc/shawshank_intel/config"
+	utls "github.com/refraction-networking/utls"
+	"io"
+	"log"
+)
+
+const ESNI uint16 = 0xffce
+
+type ESNIExtension struct {
+	*utls.GenericExtension
+	keyShare []utls.KeyShare
+	data     []byte
+}
+
+func (e *ESNIExtension) Len() int {
+	return 4 + len(e.data)
+}
+
+func (e *ESNIExtension) Read(b []byte) (n int, err error) {
+	if len(b) < e.Len() {
+		return 0, io.ErrShortBuffer
+	}
+	offset := 0
+	appendUint16 := func(val uint16) {
+		b[offset] = byte(val >> 8)
+		b[offset+1] = byte(val & 0xff)
+		offset += 2
+	}
+
+	appendUint8 := func(val uint8) {
+		b[offset] = byte(val)
+		offset += 1
+	}
+
+	// Extension type
+	appendUint16(ESNI)
+
+	dataLength := len(e.data)
+	appendUint16(uint16(dataLength))
+
+	// Algorithms list
+	for i := 0; i < dataLength; i++ {
+		appendUint8(e.data[i])
+	}
+
+	return e.Len(), io.EOF
+}
+
+// CheckESNI
+func CheckESNI() int {
+	// request configuration
+	req := "GET /cdn-cgi/trace HTTP/1.1\r\n" +
+		"Host: " + config.DummyServerDomain + "\r\n" +
+		"Accept: */*\r\n" +
+		"User-Agent: " + config.UserAgent + "\r\n\r\n"
+
+	// esni data just enough to trigger the censor
+	esnidata := []byte("\x13\x01\x00\x1d\x00\x20" +
+		// key share entry
+		"\xdc\x57\xde\xcf\x03\x91\x17\x22" +
+		"\xf6\xa7\xa2\x36\x29\xb8\x2b\xd4" +
+		"\x51\x93\xae\x06\x5d\xbd\xca\x93" +
+		"\xaa\x62\x02\x9e\x6f\xc6\x30\x32" +
+		// record digest
+		"\x00\x20" +
+		"\x4a\xd6\x5f\xfb\xaf\x50\xf3\xb6" +
+		"\x79\x91\x39\xf3\x98\x88\x07\x55" +
+		"\x83\x5b\x40\x08\x13\x94\xbc\xcf" +
+		"\x53\x73\x7b\x75\x28\x22\xb9\xf3" +
+		// esni
+		"\x01\x24" +
+		"\xc4\x9e\x26\x91\x99\xcb\x6f\x0d\x33\x2a\x46\x6d\xf8\xe7\x9c\xd0" +
+		"\x2c\xc9\xa7\x75\x5e\xdf\xce\xf2\xcf\x79\x33\xb2\x2e\xa9\xf1\xec" +
+		"\x40\xc1\xb8\xdb\xb2\x85\xfd\x94\x27\x92\x71\x05\x29\xab\x47\xe4" +
+		"\xcf\xb0\x99\xe2\x80\x7e\x25\x1f\x08\x03\xd5\x5d\xcd\x45\x22\x00" +
+		"\x9f\xb8\x09\x12\x07\x33\x07\x56\xb2\x76\xf5\xb1\x3b\x0b\x7a\x63" +
+		"\x29\x95\xe9\x2f\x3a\xfc\x5c\x0a\x75\x98\xb9\x4a\x7b\xb0\xd9\xa7" +
+		"\xf8\x56\x00\xc2\x69\xb9\xdc\x7b\xfa\x51\xd8\xbb\x19\x85\x8b\xb6" +
+		"\x4d\xbe\x24\xa0\x6a\xa7\xc8\x64\xad\xf8\x4d\xd8\x7d\xb1\x66\xc5" +
+		"\xdc\x04\x9a\x4a\xd8\x1d\x5d\xb1\xf6\xf6\x5f\xcd\x99\xb0\x14\xb8" +
+		"\x17\x6f\x80\xdb\xb9\x68\xf2\x39\xc6\xd1\xae\xc7\xb3\xb6\x35\x35" +
+		"\x09\xfe\x10\xb0\xdb\x73\x24\xbd\xbe\x09\xc5\xa6\x4b\xa3\x12\xf3" +
+		"\xcf\x19\x18\xfa\x6e\x58\x67\x62\xcf\xa6\x9c\x5e\x63\xac\xec\xd9" +
+		"\x4e\x90\x7f\x3d\xa4\xfd\x1a\x24\x75\x11\xe6\xd5\xff\x9a\xd8\x08" +
+		"\x43\xc7\x3c\xfe\x5e\x79\xaf\x80\xee\xaf\x52\xff\x83\x2d\x8d\xfd" +
+		"\x40\x86\x69\xd7\x27\x90\xc9\xf5\x2e\x79\x57\x8c\x1a\x15\xa9\x62" +
+		"\x01\xfb\x9c\x9c\x7c\x36\xad\x35\xc3\xa0\x6e\xf4\x5e\x07\xb3\x20" +
+		"\xf6\x10\x8a\x95\x89\x96\x31\xf2\x38\x60\xa6\x8c\xe9\xc4\xf1\xc5" +
+		"\x10\xa6\xe6\x3a\x7a\x17\x4c\xac\x0f\x72\xd7\x93\x90\x92\x17\x77\x85\x50\x3c\x53")
+
+	keyshare1 := utls.KeyShare{
+		Group: 29,
+		Data: []byte("\x9c\xd8\x61\x9c\x4e\x19\xcd\x38" +
+			"\x89\x2f\x4a\x3f\xa0\x40\xb7\x13" +
+			"\xa5\x24\x7f\x63\x70\x76\x9a\x25" +
+			"\x56\x33\x80\xc8\x1b\xad\x9c\x1f"),
+	}
+	keyshare2 := utls.KeyShare{
+		Group: 23,
+		Data: []byte("\x04\x22\x2f\x60\x6c\x5e\xd2\xb1" +
+			"\x8e\xb6\xc7\xda\x50\xcd\x98\x09" +
+			"\xd1\xcd\xf4\xe4\x55\xb5\x9e\xca" +
+			"\x9a\xee\x43\x10\xa8\x7c\x03\x76" +
+			"\xce\x30\xd7\x61\xda\x7b\x4a\xa0" +
+			"\x6f\x81\xa7\x37\xe0\x3f\xb6\xd9" +
+			"\x48\x1e\xa5\x94\xe4\x36\x77\x41" +
+			"\xe6\xa5\x92\x60\x3d\xf0\xe8\x17\x57"),
+	}
+
+	chloSpec := utls.ClientHelloSpec{
+		CipherSuites: []uint16{
+			0x1301, 0x1302, 0x1303, 0xc02b,
+			0xc02f, 0xcca9, 0xcca8, 0xc02c,
+			0xc030, 0xc00a, 0xc009, 0xc013,
+			0xc014, 0x009c, 0x009d, 0x002f,
+			0x0035, 0x000a,
+		},
+		Extensions: []utls.TLSExtension{
+			&utls.UtlsExtendedMasterSecretExtension{},
+			&utls.SupportedCurvesExtension{
+				Curves: []utls.CurveID{0x001d, 0x0017, 0x0018, 0x0019, 0x0100, 0x0101},
+			},
+			&utls.ALPNExtension{
+				AlpnProtocols: []string{"h2", "http/1.1"},
+			},
+			&utls.KeyShareExtension{
+				KeyShares: []utls.KeyShare{keyshare1, keyshare2},
+			},
+			&utls.SupportedVersionsExtension{
+				Versions: []uint16{0x0304, 0x0303},
+			},
+			&utls.SignatureAlgorithmsExtension{
+				SupportedSignatureAlgorithms: []utls.SignatureScheme{
+					0x0403, 0x0503, 0x0603, 0x0804,
+					0x0805, 0x0806, 0x0401, 0x0501,
+					0x0601, 0x0203, 0x0201,
+				},
+			},
+			&ESNIExtension{
+				data: esnidata,
+			},
+		},
+	}
+
+	resultCode, _, err := SendHTTPSRequestCustom(config.ESNIDomain, config.ESNIIP, 443, req, chloSpec)
+	if resultCode == -10 {
+		log.Println("[*] Error - " + config.ESNIDomain + " - " + err.Error())
+	}
+
+	return resultCode
+}

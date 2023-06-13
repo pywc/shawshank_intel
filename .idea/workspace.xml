@@ -7,10 +7,8 @@
     <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/01_sni.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/01_sni.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/03_blindtls.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/03_blindtls.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/02_esni.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/02_esni.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/sender.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/connection.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/connection.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
