@@ -7,90 +7,11 @@ import (
 	"github.com/pywc/shawshank_intel/config"
 	utls "github.com/refraction-networking/utls"
 	"golang.org/x/net/proxy"
-	"io"
 	"net"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
-
-// Parse the Content-Length header from the response headers
-func getContentLength(headers string) int64 {
-	lines := strings.Split(headers, "\r\n")
-	for _, line := range lines {
-		if strings.HasPrefix(line, "Content-Length:") {
-			value := strings.TrimSpace(line[len("Content-Length:"):])
-			length, err := strconv.ParseInt(value, 10, 64)
-			if err == nil {
-				return length
-			}
-		}
-	}
-	return 0
-}
-
-// Check if the response is chunked encoded
-func isChunkedEncoding(headers string) bool {
-	lines := strings.Split(headers, "\r\n")
-	for _, line := range lines {
-		if strings.HasPrefix(line, "Transfer-Encoding:") {
-			value := strings.TrimSpace(line[len("Transfer-Encoding:"):])
-			return strings.ToLower(value) == "chunked"
-		}
-	}
-	return false
-}
-
-// Read the response body when it is chunked encoded
-func readChunkedBody(reader *bufio.Reader) (string, error) {
-	body := ""
-	for {
-		// Read the chunk size
-		sizeLine, err := reader.ReadString('\n')
-		if err != nil {
-			return "", err
-		}
-		sizeLine = strings.TrimSpace(sizeLine)
-		chunkSize, err := strconv.ParseInt(sizeLine, 16, 64)
-		if err != nil {
-			return "", err
-		}
-
-		if chunkSize == 0 {
-			// Reached the end of chunked response
-			break
-		}
-
-		// Read the chunk data
-		chunk := make([]byte, chunkSize)
-		_, err = io.ReadFull(reader, chunk)
-		if err != nil {
-			return "", err
-		}
-
-		// Append the chunk data to the body
-		body += string(chunk)
-
-		// Read the CRLF after the chunk data
-		_, err = reader.ReadString('\n')
-		if err != nil {
-			return "", err
-		}
-	}
-
-	return body, nil
-}
-
-// Read the response body when it has a known length
-func readResponseBody(reader *bufio.Reader, contentLength int64) (string, error) {
-	body := make([]byte, contentLength)
-	_, err := io.ReadFull(reader, body)
-	if err != nil {
-		return "", err
-	}
-	return string(body), nil
-}
 
 // ConnectNormally Connect to the address normally
 func ConnectNormally(addr string, port int) (net.Conn, error) {
