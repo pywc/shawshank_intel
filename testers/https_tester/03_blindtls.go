@@ -1,12 +1,10 @@
 package https_tester
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/util"
 	utls "github.com/refraction-networking/utls"
-	"net/http"
 	url2 "net/url"
 	"strings"
 )
@@ -56,21 +54,15 @@ func CheckTLS12Resumption(domain string, ip string) (int, error) {
 		}
 	}
 
-	// parse http response
-	reader := bufio.NewReader(strings.NewReader(resp))
-	respObj, err := http.ReadResponse(reader, nil)
-	if err != nil {
-		return -10, err
-	}
-
-	resultCode := respObj.StatusCode
+	resultCode := resp.StatusCode
+	respHeader := resp.Header
 
 	if resultCode >= 400 {
 		// check 4xx - 5xx
 		return resultCode, nil
 	} else if resultCode >= 300 {
 		// check if redirection url is correct
-		redirectURL := respObj.Header["Location"][0]
+		redirectURL := respHeader["Location"][0]
 		if redirectURL != "" {
 			urlCompare, _ := url2.Parse(redirectURL)
 			urlOriginElements := strings.Split(domain, ".")

@@ -9,6 +9,7 @@ import (
 	"golang.org/x/net/proxy"
 	"io"
 	"net"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -123,53 +124,33 @@ func ConnectViaProxy(addr string, port int) (net.Conn, error) {
 }
 
 // SendHTTPTraffic Send HTTP GET request and get response
-func SendHTTPTraffic(conn net.Conn, request string) (string, error) {
+func SendHTTPTraffic(conn net.Conn, request string) (*http.Response, error) {
 	_, err := conn.Write([]byte(request))
 	if err != nil {
 		fmt.Println("Failed to send HTTP request:", err)
-		return "", err
+		return nil, err
 	}
 
-	// Read the response header
-	respHeader := ""
-	reader := bufio.NewReader(conn)
-	for {
-		packet, err := reader.ReadString('\n')
-		if err != nil {
-			return "", err
-		}
-		respHeader += packet
-
-		// Check if the response headers are complete
-		if strings.TrimSpace(packet) == "" {
-			break
-		}
+	// Read the response
+	response, err := http.ReadResponse(bufio.NewReader(conn), nil)
+	if err != nil {
+		return nil, err
 	}
 
-	// Read the response body
-	isChunked := isChunkedEncoding(respHeader)
-	respBody := ""
-	if isChunked {
-		respBody, err = readChunkedBody(reader)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		// Read the response body with Content-Length header
-		contentLength := getContentLength(respHeader)
-		respBody, err = readResponseBody(reader, contentLength)
-		if err != nil {
-			return "", err
-		}
-	}
-
-	return respHeader + respBody, nil
+	return response, nil
 }
 
 // SendHTTPSTraffic Send HTTP GET request with TLS and get response
-func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config) (string, error) {
+func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config,
+	extensions []utls.TLSExtension, chloID utls.ClientHelloID) (*http.Response, error) {
 	// Create a TLS connection over the proxy connection
-	tlsConn := utls.UClient(conn, utlsConfig, utls.HelloGolang)
+	tlsConn := utls.UClient(conn, utlsConfig, chloID)
+	tlsConn.BuildHandshakeState()
+
+	// Add extensions
+	for _, ext := range extensions {
+		tlsConn.Extensions = append(tlsConn.Extensions, ext)
+	}
 
 	// Set a timeout for the TLS handshake
 	tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
@@ -177,7 +158,7 @@ func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config) (s
 	// Perform the TLS handshake
 	err := tlsConn.Handshake()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Reset the deadline
@@ -185,53 +166,33 @@ func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config) (s
 
 	_, err = tlsConn.Write([]byte(request))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	// Read the response header
-	respHeader := ""
-	reader := bufio.NewReader(tlsConn)
-	for {
-		packet, err := reader.ReadString('\n')
-		if err != nil {
-			return "", err
-		}
-		respHeader += packet
-
-		// Check if the response headers are complete
-		if strings.TrimSpace(packet) == "" {
-			break
-		}
+	// Read the response
+	response, err := http.ReadResponse(bufio.NewReader(tlsConn), nil)
+	if err != nil {
+		return nil, err
 	}
 
-	// Read the response body
-	isChunked := isChunkedEncoding(respHeader)
-	respBody := ""
-	if isChunked {
-		respBody, err = readChunkedBody(reader)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		// Read the response body with Content-Length header
-		contentLength := getContentLength(respHeader)
-		respBody, err = readResponseBody(reader, contentLength)
-		if err != nil {
-			return "", err
-		}
-	}
-
-	return respHeader + respBody, nil
+	return response, nil
 }
 
 // SendHTTPSTrafficCustom Send HTTP GET request with TLS and get response
-func SendHTTPSTrafficCustom(conn net.Conn, request string, chloSpec *utls.ClientHelloSpec) (string, error) {
+func SendHTTPSTrafficCustom(conn net.Conn, request string, extensions []utls.TLSExtension) (*http.Response, error) {
+	utlsConfig := utls.Config{
+		InsecureSkipVerify: true,
+		MinVersion:         utls.VersionTLS12,
+		MaxVersion:         utls.VersionTLS13,
+	}
+
 	// Create a TLS connection over the proxy connection
-	tlsConn := utls.UClient(conn, &utls.Config{InsecureSkipVerify: true}, utls.HelloCustom)
+	tlsConn := utls.UClient(conn, &utlsConfig, utls.HelloRandomizedNoALPN)
+	tlsConn.BuildHandshakeState()
 
-	fmt.Println(chloSpec.CipherSuites)
-
-	tlsConn.ApplyPreset(chloSpec)
+	for _, ext := range extensions {
+		tlsConn.Extensions = append(tlsConn.Extensions, ext)
+	}
 
 	// Set a timeout for the TLS handshake
 	tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
@@ -239,7 +200,7 @@ func SendHTTPSTrafficCustom(conn net.Conn, request string, chloSpec *utls.Client
 	// Perform the TLS handshake
 	err := tlsConn.Handshake()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Reset the deadline
@@ -247,43 +208,19 @@ func SendHTTPSTrafficCustom(conn net.Conn, request string, chloSpec *utls.Client
 
 	_, err = tlsConn.Write([]byte(request))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Read the response header
-	respHeader := ""
-	reader := bufio.NewReader(tlsConn)
-	for {
-		packet, err := reader.ReadString('\n')
-		if err != nil {
-			return "", err
-		}
-		respHeader += packet
-
-		// Check if the response headers are complete
-		if strings.TrimSpace(packet) == "" {
-			break
-		}
+	response, err := http.ReadResponse(bufio.NewReader(tlsConn), nil)
+	if err != nil {
+		return nil, err
 	}
 
-	// Read the response body
-	isChunked := isChunkedEncoding(respHeader)
-	respBody := ""
-	if isChunked {
-		respBody, err = readChunkedBody(reader)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		// Read the response body with Content-Length header
-		contentLength := getContentLength(respHeader)
-		respBody, err = readResponseBody(reader, contentLength)
-		if err != nil {
-			return "", err
-		}
-	}
+	// Process the HTTP response
+	//fmt.Printf("HTTP Response Status: %s\n", response.Status)
 
-	return respHeader + respBody, nil
+	return response, nil
 }
 
 type TLSSession struct {
@@ -337,7 +274,7 @@ func GetNewTLSSession(conn net.Conn, request string, utlsConfig *utls.Config) (*
 }
 
 // ResumeTLSSession
-func ResumeTLSSession(conn net.Conn, request string, sess TLSSession) (string, error) {
+func ResumeTLSSession(conn net.Conn, request string, sess TLSSession) (*http.Response, error) {
 	utlsConfig := utls.Config{
 		ServerName:         config.DummyServerDomain,
 		InsecureSkipVerify: true,
@@ -361,7 +298,7 @@ func ResumeTLSSession(conn net.Conn, request string, sess TLSSession) (string, e
 	tlsConn.HandshakeState.Hello.SessionId = sess.ID
 	err := tlsConn.SetSessionState(state)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Set a timeout for the TLS handshake
@@ -370,7 +307,7 @@ func ResumeTLSSession(conn net.Conn, request string, sess TLSSession) (string, e
 	// Perform the TLS handshake
 	err = tlsConn.Handshake()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Reset the deadline
@@ -379,41 +316,14 @@ func ResumeTLSSession(conn net.Conn, request string, sess TLSSession) (string, e
 	// Send HTTP request
 	_, err = tlsConn.Write([]byte(request))
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	// Read the response header
-	respHeader := ""
-	reader := bufio.NewReader(tlsConn)
-	for {
-		packet, err := reader.ReadString('\n')
-		if err != nil {
-			return "", err
-		}
-		respHeader += packet
-
-		// Check if the response headers are complete
-		if strings.TrimSpace(packet) == "" {
-			break
-		}
+	// Read the response
+	response, err := http.ReadResponse(bufio.NewReader(tlsConn), nil)
+	if err != nil {
+		return nil, err
 	}
 
-	// Read the response body
-	isChunked := isChunkedEncoding(respHeader)
-	respBody := ""
-	if isChunked {
-		respBody, err = readChunkedBody(reader)
-		if err != nil {
-			return "", err
-		}
-	} else {
-		// Read the response body with Content-Length header
-		contentLength := getContentLength(respHeader)
-		respBody, err = readResponseBody(reader, contentLength)
-		if err != nil {
-			return "", err
-		}
-	}
-
-	return respHeader + respBody, nil
+	return response, nil
 }
