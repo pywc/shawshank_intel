@@ -178,51 +178,6 @@ func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config,
 	return response, nil
 }
 
-// SendHTTPSTrafficCustom Send HTTP GET request with TLS and get response
-func SendHTTPSTrafficCustom(conn net.Conn, request string, extensions []utls.TLSExtension) (*http.Response, error) {
-	utlsConfig := utls.Config{
-		InsecureSkipVerify: true,
-		MinVersion:         utls.VersionTLS12,
-		MaxVersion:         utls.VersionTLS13,
-	}
-
-	// Create a TLS connection over the proxy connection
-	tlsConn := utls.UClient(conn, &utlsConfig, utls.HelloRandomizedNoALPN)
-	tlsConn.BuildHandshakeState()
-
-	for _, ext := range extensions {
-		tlsConn.Extensions = append(tlsConn.Extensions, ext)
-	}
-
-	// Set a timeout for the TLS handshake
-	tlsConn.SetDeadline(time.Now().Add(10 * time.Second))
-
-	// Perform the TLS handshake
-	err := tlsConn.Handshake()
-	if err != nil {
-		return nil, err
-	}
-
-	// Reset the deadline
-	tlsConn.SetDeadline(time.Time{})
-
-	_, err = tlsConn.Write([]byte(request))
-	if err != nil {
-		return nil, err
-	}
-
-	// Read the response header
-	response, err := http.ReadResponse(bufio.NewReader(tlsConn), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	// Process the HTTP response
-	//fmt.Printf("HTTP Response Status: %s\n", response.Status)
-
-	return response, nil
-}
-
 type TLSSession struct {
 	version      uint16
 	cipherSuite  uint16
