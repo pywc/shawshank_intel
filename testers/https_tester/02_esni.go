@@ -51,9 +51,12 @@ func (e *ESNIExtension) Read(b []byte) (n int, err error) {
 
 // CheckESNI
 func CheckESNI() int {
+	domain := config.ESNIDomain
+	ip := config.ESNIIP
+
 	// request configuration
 	req := "GET /cdn-cgi/trace HTTP/1.1\r\n" +
-		"Host: " + config.DummyServerDomain + "\r\n" +
+		"Host: " + domain + "\r\n" +
 		"Accept: */*\r\n" +
 		"User-Agent: " + config.UserAgent + "\r\n\r\n"
 
@@ -91,63 +94,16 @@ func CheckESNI() int {
 		"\xf6\x10\x8a\x95\x89\x96\x31\xf2\x38\x60\xa6\x8c\xe9\xc4\xf1\xc5" +
 		"\x10\xa6\xe6\x3a\x7a\x17\x4c\xac\x0f\x72\xd7\x93\x90\x92\x17\x77\x85\x50\x3c\x53")
 
-	keyshare1 := utls.KeyShare{
-		Group: 29,
-		Data: []byte("\x9c\xd8\x61\x9c\x4e\x19\xcd\x38" +
-			"\x89\x2f\x4a\x3f\xa0\x40\xb7\x13" +
-			"\xa5\x24\x7f\x63\x70\x76\x9a\x25" +
-			"\x56\x33\x80\xc8\x1b\xad\x9c\x1f"),
-	}
-	keyshare2 := utls.KeyShare{
-		Group: 23,
-		Data: []byte("\x04\x22\x2f\x60\x6c\x5e\xd2\xb1" +
-			"\x8e\xb6\xc7\xda\x50\xcd\x98\x09" +
-			"\xd1\xcd\xf4\xe4\x55\xb5\x9e\xca" +
-			"\x9a\xee\x43\x10\xa8\x7c\x03\x76" +
-			"\xce\x30\xd7\x61\xda\x7b\x4a\xa0" +
-			"\x6f\x81\xa7\x37\xe0\x3f\xb6\xd9" +
-			"\x48\x1e\xa5\x94\xe4\x36\x77\x41" +
-			"\xe6\xa5\x92\x60\x3d\xf0\xe8\x17\x57"),
-	}
+	// Add ESNI extension
+	esniext := ESNIExtension{data: esnidata}
+	exts := make([]utls.TLSExtension, 1)
+	exts[0] = &esniext
 
-	chloSpec := utls.ClientHelloSpec{
-		CipherSuites: []uint16{
-			0x1301, 0x1302, 0x1303, 0xc02b,
-			0xc02f, 0xcca9, 0xcca8, 0xc02c,
-			0xc030, 0xc00a, 0xc009, 0xc013,
-			0xc014, 0x009c, 0x009d, 0x002f,
-			0x0035, 0x000a,
-		},
-		Extensions: []utls.TLSExtension{
-			&utls.UtlsExtendedMasterSecretExtension{},
-			&utls.SupportedCurvesExtension{
-				Curves: []utls.CurveID{0x001d, 0x0017, 0x0018, 0x0019, 0x0100, 0x0101},
-			},
-			&utls.ALPNExtension{
-				AlpnProtocols: []string{"h2", "http/1.1"},
-			},
-			&utls.KeyShareExtension{
-				KeyShares: []utls.KeyShare{keyshare1, keyshare2},
-			},
-			&utls.SupportedVersionsExtension{
-				Versions: []uint16{0x0304, 0x0303},
-			},
-			&utls.SignatureAlgorithmsExtension{
-				SupportedSignatureAlgorithms: []utls.SignatureScheme{
-					0x0403, 0x0503, 0x0603, 0x0804,
-					0x0805, 0x0806, 0x0401, 0x0501,
-					0x0601, 0x0203, 0x0201,
-				},
-			},
-			&ESNIExtension{
-				data: esnidata,
-			},
-		},
-	}
+	// Send request
+	resultCode, _, err := SendHTTPSRequestCustom(domain, ip, 443, req, exts)
 
-	resultCode, _, err := SendHTTPSRequestCustom(config.ESNIDomain, config.ESNIIP, 443, req, chloSpec)
 	if resultCode == -10 {
-		log.Println("[*] Error - " + config.ESNIDomain + " - " + err.Error())
+		log.Println("[*] Error - " + domain + " - " + err.Error())
 	}
 
 	return resultCode

@@ -4,10 +4,11 @@ import (
 	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/util"
 	utls "github.com/refraction-networking/utls"
+	"io"
 	"strings"
 )
 
-// SendHTTPSRequest Returns result_code, response_body, redirect_url (if redirection)
+// SendHTTPSRequest Returns result_code, response_body
 /*
 	Result Code Entry
 	=========================
@@ -41,7 +42,13 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 		}
 	}
 
-	resp, err := util.SendHTTPSTraffic(conn, req, utlsConfig)
+	resp, err := util.SendHTTPSTraffic(conn, req, utlsConfig, nil, utls.HelloGolang)
+	if err != nil {
+		return -10, "", err
+	}
+
+	respBody, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
 	conn.Close()
 
 	// check tcp errors
@@ -63,10 +70,10 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 		}
 	}
 
-	return 0, resp, nil
+	return 0, string(respBody), nil
 }
 
-// SendHTTPSRequestCustom Returns result_code, response_body, redirect_url (if redirection)
+// SendHTTPSRequestCustom Returns result_code, response_body
 /*
 	Result Code Entry
 	=========================
@@ -80,7 +87,7 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 	5: invalid certificate
 */
 func SendHTTPSRequestCustom(domain string, ip string, port int,
-	req string, chloSpec utls.ClientHelloSpec) (int, string, error) {
+	req string, extensions []utls.TLSExtension) (int, string, error) {
 	// Fetch via proxy
 	conn, err := util.ConnectViaProxy(ip, port)
 
@@ -101,7 +108,19 @@ func SendHTTPSRequestCustom(domain string, ip string, port int,
 		}
 	}
 
-	resp, err := util.SendHTTPSTrafficCustom(conn, req, &chloSpec)
+	utlsConfig := utls.Config{
+		InsecureSkipVerify: true,
+		MinVersion:         utls.VersionTLS12,
+		MaxVersion:         utls.VersionTLS13,
+	}
+
+	resp, err := util.SendHTTPSTraffic(conn, req, &utlsConfig, extensions, utls.HelloRandomizedNoALPN)
+	if err != nil {
+		return -10, "", err
+	}
+
+	respBody, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
 	conn.Close()
 
 	// check tcp errors
@@ -123,5 +142,5 @@ func SendHTTPSRequestCustom(domain string, ip string, port int,
 		}
 	}
 
-	return 0, resp, nil
+	return 0, string(respBody), nil
 }

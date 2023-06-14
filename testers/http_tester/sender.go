@@ -1,10 +1,9 @@
 package http_tester
 
 import (
-	"bufio"
 	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/util"
-	"net/http"
+	"io"
 	url2 "net/url"
 	"strings"
 )
@@ -39,6 +38,7 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 		// IP is not accessible from the US
 		return -2, "", "", err
 	}
+
 	resp, err := util.SendHTTPTraffic(conn, req)
 	conn.Close()
 	if err != nil {
@@ -61,7 +61,6 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 	}
 
 	resp, err = util.SendHTTPTraffic(conn, req)
-	conn.Close()
 
 	// check tcp errors
 	if err != nil {
@@ -80,20 +79,18 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 		}
 	}
 
-	// parse http response
-	reader := bufio.NewReader(strings.NewReader(resp))
-	respObj, err := http.ReadResponse(reader, nil)
-	if err != nil {
-		return -10, "", "", err
-	}
-	resultCode := respObj.StatusCode
+	resultCode := resp.StatusCode
+	respHeader := resp.Header
+	respBody, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	conn.Close()
 
 	if resultCode >= 400 {
 		// check 4xx - 5xx
-		return resultCode, resp, "", nil
+		return resultCode, string(respBody), "", nil
 	} else if resultCode >= 300 {
 		// check redirection
-		redirectURL := respObj.Header["Location"][0]
+		redirectURL := respHeader["Location"][0]
 		if redirectURL != "" {
 			urlCompare, _ := url2.Parse(redirectURL)
 			urlOriginElements := strings.Split(domain, ".")
@@ -112,10 +109,10 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 			}
 
 			if len(result) < 2 {
-				return respObj.StatusCode, resp, redirectURL, nil
+				return resultCode, string(respBody), redirectURL, nil
 			}
 		}
 	}
 
-	return 0, resp, "", nil
+	return 0, string(respBody), "", nil
 }

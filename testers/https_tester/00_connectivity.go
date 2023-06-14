@@ -1,6 +1,7 @@
 package https_tester
 
 import (
+	"fmt"
 	"github.com/pywc/shawshank_intel/config"
 	utls "github.com/refraction-networking/utls"
 	"log"
@@ -18,7 +19,8 @@ func CheckHTTPSConnectivity(domain string, ip string) int {
 		ServerName: domain,
 	}
 
-	resultCode, _, err := SendHTTPSRequest(domain, ip, 443, req, &utlsConfig)
+	resultCode, resp, err := SendHTTPSRequest(domain, ip, 443, req, &utlsConfig)
+	fmt.Println(resp)
 	if resultCode == -10 {
 		log.Println("[*] Error - " + domain + " - " + err.Error())
 	}
