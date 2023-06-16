@@ -4,9 +4,15 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="Implemented GetTestDomains">
+    <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="Removed unnecessary HTTP response read utils">
+      <change afterPath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/http_tester/generators.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/https_tester/05_cenfuzz.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/https_tester/generators.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/connection.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/connection.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,7 +116,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Implemented GetTestDomains" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented GetTestDomains" />
+    <MESSAGE value="Removed unnecessary HTTP response read utils" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removed unnecessary HTTP response read utils" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
