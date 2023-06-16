@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-type FilteredHeaderHost struct {
-	host        string
+type FilteredHTTP struct {
+	component   string
 	resultCode  int
 	redirectURL string
 }
@@ -22,9 +22,9 @@ type FilteredHeaderHost struct {
 	1: exact-match
 	2: wildcard-based
 */
-func CheckHTTPHeaderHost(domain string) (int, []FilteredHeaderHost) {
+func CheckHTTPHeaderHost(domain string) (int, []FilteredHTTP) {
 	testList := config.DomainWildcards(domain)
-	filteredList := make([]FilteredHeaderHost, len(testList))
+	filteredList := make([]FilteredHTTP, len(testList))
 
 	for _, testDomain := range testList {
 		req := "POST / HTTP/1.1\r\nHost: " + testDomain + "\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"
@@ -39,8 +39,8 @@ func CheckHTTPHeaderHost(domain string) (int, []FilteredHeaderHost) {
 			redirectURL = "unknown"
 		}
 
-		filtered := FilteredHeaderHost{
-			host:        testDomain,
+		filtered := FilteredHTTP{
+			component:   testDomain,
 			resultCode:  resultCode,
 			redirectURL: redirectURL,
 		}
