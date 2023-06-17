@@ -40,7 +40,6 @@ func removeDuplicateStr(strSlice []string) []string {
 	return list
 }
 
-// TODO: implement getting test domains
 func GetTestDomains(countryCode string) ([]string, error) {
 	testList := make([]string, 0)
 

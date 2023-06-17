@@ -11,13 +11,7 @@ import (
 	"strings"
 )
 
-type FilteredTokens struct {
-	token       string
-	resultCode  int
-	redirectURL string
-}
-
-func CheckHTMLTokens(domain string) ([]FilteredTokens, error) {
+func CheckHTMLTokens(domain string) ([]FilteredHTTP, error) {
 	// Fetch the HTML content from the domain
 	respClean, err := http.Get("http://" + domain)
 	if err != nil {
@@ -44,7 +38,7 @@ func CheckHTMLTokens(domain string) ([]FilteredTokens, error) {
 	}
 
 	// send each token to echo server
-	filteredList := make([]FilteredTokens, 0)
+	filteredList := make([]FilteredHTTP, 0)
 	for _, token := range testList {
 		req := "POST / HTTP/1.1\r\nHost: " + config.EchoServerAddr + "\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"
 		req += "magicWord=" + url.QueryEscape(token)
@@ -60,8 +54,8 @@ func CheckHTMLTokens(domain string) ([]FilteredTokens, error) {
 			continue
 		}
 
-		filtered := FilteredTokens{
-			token:       token,
+		filtered := FilteredHTTP{
+			component:   token,
 			resultCode:  resultCode,
 			redirectURL: redirectURL,
 		}

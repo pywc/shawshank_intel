@@ -306,7 +306,6 @@ func CheckHeaderAlternate(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-// TODO
 func CheckHostnameAlternate(hostname string, ip string) []FilteredHTTP {
 	hostnameAllAlternate := GenerateAllHostNameAlternatives(hostname)
 	filteredList := make([]FilteredHTTP, len(hostnameAllAlternate))

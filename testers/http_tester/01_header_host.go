@@ -7,12 +7,6 @@ import (
 	"strings"
 )
 
-type FilteredHTTP struct {
-	component   string
-	resultCode  int
-	redirectURL string
-}
-
 // CheckHTTPHeaderHost Checks whether wildcard-based filtering is used based on HTTP Host field
 // Sets 399 as result code if it does not contain the correct magic word
 /*

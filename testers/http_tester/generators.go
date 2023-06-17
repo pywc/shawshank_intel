@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jpillora/go-tld"
 	combinations "github.com/mxschmitt/golang-combinations"
+	"github.com/pywc/shawshank_intel/util"
 	"log"
 	"math/rand"
 	"strconv"
@@ -61,15 +62,15 @@ func FormatHttpRequest(requestWord RequestWord) string {
 			//Now there should be a third part that says how many times to repeat
 			repeatTimes, err := strconv.Atoi(hostNameParts[2])
 			if err != nil {
-				log.Println("[https_fuzzer.CreateTLSConfig] Error converting string into integer (repeat)")
+				log.Println("[http_fuzzer.FormatHTTPRequest] Error converting string into integer (repeat)")
 				log.Println(err)
 				log.Println("Reverting to default")
 				host = hostNameParts[0]
 			} else {
-				host = Repeat(hostNameParts[0], repeatTimes)
+				host = util.Repeat(hostNameParts[0], repeatTimes)
 			}
 		} else if hostNameParts[1] == "reverse" {
-			host = Reverse(hostNameParts[0])
+			host = util.Reverse(hostNameParts[0])
 		} else if hostNameParts[1] == "tld" {
 			domainParts, _ := tld.Parse("https://" + hostNameParts[0])
 			if domainParts.Subdomain != "" {
@@ -87,22 +88,6 @@ func FormatHttpRequest(requestWord RequestWord) string {
 
 	format := "%s%s%s%s%s%s\r\n%s\r\n"
 	return fmt.Sprintf(format, getWord, path, httpWord, httpDelimiterWord, hostWord, host, header)
-}
-
-func Reverse(s string) string {
-	runes := []rune(s)
-	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
-		runes[i], runes[j] = runes[j], runes[i]
-	}
-	return string(runes)
-}
-
-func Repeat(s string, n int) string {
-	returnString := ""
-	for i := 0; i < n; i++ {
-		returnString += s
-	}
-	return returnString
 }
 
 func GenerateRandomCapitalizedValues(word string) string {
