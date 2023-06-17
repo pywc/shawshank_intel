@@ -59,7 +59,7 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 			return -1, "", "", nil
 		} else if ip == config.EchoServerAddr {
 			// residual censorship detection mode
-			util.DetectResidual(domain, ip, port)
+			util.DetectResidual(ip, port, "http")
 		} else {
 			// unknown error
 			return -10, "", "", err

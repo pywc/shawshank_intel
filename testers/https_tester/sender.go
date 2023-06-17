@@ -36,7 +36,7 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 			return -1, "", nil
 		} else if ip == config.DummyServerIP {
 			// residual censorship detection mode
-			util.DetectResidual(domain, ip, port)
+			util.DetectResidual(ip, port, "https")
 			conn, err = util.ConnectViaProxy(ip, port)
 			if err != nil {
 				return -10, "", err
@@ -100,9 +100,9 @@ func SendHTTPSRequestCustom(domain string, ip string, port int,
 		if strings.Contains(err.Error(), "general SOCKS server failure") {
 			// cannot connect to proxy
 			return -1, "", nil
-		} else if ip == config.DummyServerIP {
+		} else if ip == config.ESNIIP {
 			// residual censorship detection mode
-			util.DetectResidual(domain, ip, port)
+			util.DetectResidual(ip, port, "https")
 			conn, err = util.ConnectViaProxy(ip, port)
 			if err != nil {
 				return -10, "", err
