@@ -8,6 +8,12 @@ import (
 	"strings"
 )
 
+type FilteredHTTP struct {
+	component   string
+	resultCode  int
+	redirectURL string
+}
+
 // SendHTTPRequest Returns result_code, response_body, redirect_url (if redirection)
 /*
 	Result Code Entry

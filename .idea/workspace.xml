@@ -4,15 +4,19 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="Removed unnecessary HTTP response read utils">
-      <change afterPath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testers/http_tester/generators.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testers/https_tester/05_cenfuzz.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testers/https_tester/generators.go" afterDir="false" />
+    <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="HTTP Cenfuzz implementation done">
+      <change afterPath="$PROJECT_DIR$/util/misc.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/generators.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/generators.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/sender.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/05_cenfuzz.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/05_cenfuzz.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/generators.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/generators.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/sender.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/geolocator.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/geolocator.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +121,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Implemented GetTestDomains" />
     <MESSAGE value="Removed unnecessary HTTP response read utils" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed unnecessary HTTP response read utils" />
+    <MESSAGE value="HTTP Cenfuzz implementation done" />
+    <option name="LAST_COMMIT_MESSAGE" value="HTTP Cenfuzz implementation done" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

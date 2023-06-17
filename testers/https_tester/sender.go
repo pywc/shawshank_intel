@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+type FilteredHTTPS struct {
+	component  string
+	resultCode int
+}
+
 // SendHTTPSRequest Returns result_code, response_body
 /*
 	Result Code Entry
