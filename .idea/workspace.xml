@@ -4,19 +4,26 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="HTTP Cenfuzz implementation done">
-      <change afterPath="$PROJECT_DIR$/util/misc.go" afterDir="false" />
+    <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="HTTPS Cenfuzz implementation done">
+      <change afterPath="$PROJECT_DIR$/data/alexa_top_100.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/dns_tester/tester.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/http_tester/tester.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/https_tester/05_splithello.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/https_tester/tester.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/quic_tester/tester.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/db.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/02_html_title.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/02_html_title.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/generators.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/generators.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/sender.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/05_cenfuzz.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/05_cenfuzz.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/generators.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/generators.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/03_blindtls.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/04_blindtls.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/04_splithello.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/03_certificate.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/05_cenfuzz.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/06_cenfuzz.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/https_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/sender.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/geolocator.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/geolocator.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/residual_detector.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/residual_detector.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/throttle_helper.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/throttle_helper.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,27 +58,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/pywchung/go/Shawshank&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;go.vgo&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
+    "last_opened_file_path": "/Users/pywchung/go/Shawshank",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "settings.editor.selected.configurable": "go.vgo"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;go&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "go"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -119,10 +127,12 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Implemented GetTestDomains" />
     <MESSAGE value="Removed unnecessary HTTP response read utils" />
     <MESSAGE value="HTTP Cenfuzz implementation done" />
-    <option name="LAST_COMMIT_MESSAGE" value="HTTP Cenfuzz implementation done" />
+    <MESSAGE value="HTTPS Cenfuzz implementation done" />
+    <option name="LAST_COMMIT_MESSAGE" value="HTTPS Cenfuzz implementation done" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

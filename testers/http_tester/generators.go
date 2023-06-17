@@ -133,7 +133,6 @@ func CapitalizedPermutations(ip string, op string) []string {
 	return unique(s)
 }
 
-// TODO: This currently only works for ASCII characters
 func GenerateAllCapitalizedPermutations(word string) []string {
 	return CapitalizedPermutations(word, "")
 }

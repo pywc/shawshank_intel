@@ -30,18 +30,24 @@ func findTitle(node *html.Node) string {
 
 // CheckHTMLTitle Checks whether HTML <title> tag is used for filtering
 // Sets 399 as result code if it does not contain the correct magic word
-func CheckHTMLTitle(domain string) (int, string) {
+func CheckHTMLTitle(domain string) HTTPConnectivityResult {
 	// Fetch the HTML content from the domain
 	respClean, err := http.Get("http://" + domain)
 	if err != nil {
-		return -3, ""
+		return HTTPConnectivityResult{
+			resultCode:  -3,
+			redirectURL: "",
+		}
 	}
 
 	// Parse the HTML document
 	doc, err := html.Parse(respClean.Body)
 	respClean.Body.Close()
 	if err != nil {
-		return -10, ""
+		return HTTPConnectivityResult{
+			resultCode:  -10,
+			redirectURL: "",
+		}
 	}
 
 	// Find the title element
@@ -61,5 +67,8 @@ func CheckHTMLTitle(domain string) (int, string) {
 		redirectURL = "unknown"
 	}
 
-	return resultCode, redirectURL
+	return HTTPConnectivityResult{
+		resultCode:  resultCode,
+		redirectURL: redirectURL,
+	}
 }
