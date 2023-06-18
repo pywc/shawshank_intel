@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-// CheckHTTPSConnectivity Check basic HTTPS connectivity to the domain
+// CheckHTTPSConnectivity Check basic HTTPS Connectivity to the domain
 func CheckHTTPSConnectivity(domain string, ip string) int {
 	// request configuration
 	req := "GET / HTTP/1.1\r\n" +

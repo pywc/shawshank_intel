@@ -60,12 +60,12 @@ func CreateTLSConfig(requestWord RequestWord) *utls.Config {
 		cert = requestWord.Certificate[0]
 		c, err := x509.ParseCertificate(cert.Certificate[0])
 		if err != nil {
-			log.Println("[https_fuzzer.CreateTLSConfig] Error parsing certificate")
+			log.Println("[https_fuzzer.CreateTLSConfig] Error parsing Certificate")
 		}
 		if c.Subject.CommonName == "" {
 			clientCertPEM, ClientCertKey, err := GenerateCertificate(requestWord.Servername)
 			if err != nil {
-				log.Println("[https_fuzzer.CreateTLSConfig] Could not generate client certificate")
+				log.Println("[https_fuzzer.CreateTLSConfig] Could not generate client Certificate")
 				log.Println(err)
 				return &utls.Config{
 					ServerName:         requestWord.Servername,
@@ -77,7 +77,7 @@ func CreateTLSConfig(requestWord RequestWord) *utls.Config {
 			}
 			cert, err = utls.X509KeyPair(clientCertPEM, ClientCertKey)
 			if err != nil {
-				log.Println("[https_fuzzer.CreateTLSConfig] Could not generate client certificate")
+				log.Println("[https_fuzzer.CreateTLSConfig] Could not generate client Certificate")
 				log.Println(err)
 				return &utls.Config{
 					ServerName:         requestWord.Servername,

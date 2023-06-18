@@ -1,10 +1,8 @@
 package util
 
 import (
-	"encoding/csv"
-	"fmt"
+	"log"
 	"net/url"
-	"os"
 )
 
 // TODO: implement maxmind geolocator
@@ -12,38 +10,12 @@ func GetCountry(ip string) string {
 	return "us"
 }
 
-func readCsvFile(filePath string) ([][]string, error) {
-	f, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	csvReader := csv.NewReader(f)
-	records, err := csvReader.ReadAll()
-	if err != nil {
-		return nil, err
-	}
-
-	return records, err
-}
-
-func removeDuplicateStr(strSlice []string) []string {
-	allKeys := make(map[string]bool)
-	list := []string{}
-	for _, item := range strSlice {
-		if _, value := allKeys[item]; !value {
-			allKeys[item] = true
-			list = append(list, item)
-		}
-	}
-	return list
-}
-
 func GetTestDomains(countryCode string) ([]string, error) {
+	log.Println("Fetching test domains...")
+
 	testList := make([]string, 0)
 
-	data, err := readCsvFile("./test-lists/lists/" + countryCode + ".csv")
+	data, err := ReadCsvFile("./test-lists/lists/" + countryCode + ".csv")
 
 	urlList := make([]string, 0)
 	for _, row := range data {
@@ -51,11 +23,9 @@ func GetTestDomains(countryCode string) ([]string, error) {
 		urlList = append(urlList, urlEntry.Host)
 	}
 
-	urlList = removeDuplicateStr(urlList)
+	urlList = RemoveDuplicateStr(urlList)
 
-	for _, u := range urlList {
-		fmt.Println(u)
-	}
+	log.Println("Fetched " + string(len(urlList)) + " domains")
 
 	return testList, err
 }

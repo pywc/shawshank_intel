@@ -1,19 +1,19 @@
 package quic_tester
 
 type QUICResult struct {
-	connectivity                     int
-	initDecrypt                      int
-	basicStreamReassembly            int
-	flowControlAwareStreamReassembly int
-	overlappingOffset                int
+	Connectivity                     int `json:"connectivity,omitempty"`
+	InitDecrypt                      int `json:"init_decrypt,omitempty"`
+	BasicStreamReassembly            int `json:"basic_stream_reassembly,omitempty"`
+	FlowControlAwareStreamReassembly int `json:"flow_control_aware_stream_reassembly,omitempty"`
+	OverlappingOffset                int `json:"overlapping_offset,omitempty"`
 }
 
 func TestQUIC(ip string, domain string) QUICResult {
 	return QUICResult{
-		connectivity:                     -5,
-		initDecrypt:                      -5,
-		basicStreamReassembly:            -5,
-		flowControlAwareStreamReassembly: -5,
-		overlappingOffset:                -5,
+		Connectivity:                     -5,
+		InitDecrypt:                      -5,
+		BasicStreamReassembly:            -5,
+		FlowControlAwareStreamReassembly: -5,
+		OverlappingOffset:                -5,
 	}
 }
