@@ -1,9 +1,10 @@
-package util
+package throttle_tester
 
 import (
 	"github.com/influxdata/tdigest"
 	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/testers/https_tester"
+	"github.com/pywc/shawshank_intel/util"
 	utls "github.com/refraction-networking/utls"
 	"time"
 )
@@ -32,7 +33,7 @@ func IsThrottled(t float64) bool {
 func InitThrottleChecker() error {
 	testList := make([]string, 0)
 
-	data, err := readCsvFile("./data/alexa_top_100.csv")
+	data, err := util.ReadCsvFile("./data/alexa_top_100.csv")
 	if err != nil {
 		return err
 	}

@@ -8,6 +8,7 @@ var ProxyIP = "35.188.143.33"
 var ProxyPort = "2408"
 var ProxyUsername = ""
 var ProxyPassword = ""
+var ProxyType = "socks5"
 
 // Throttle Test Configuration
 var ThrottlePValThreshold = 0.01

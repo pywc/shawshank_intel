@@ -3,6 +3,8 @@ package util
 import (
 	"bufio"
 	"crypto/x509"
+	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/pywc/shawshank_intel/config"
 	utls "github.com/refraction-networking/utls"
@@ -27,21 +29,56 @@ func ConnectNormally(addr string, port int) (net.Conn, error) {
 
 // ConnectViaProxy Connect to the address through the proxy
 func ConnectViaProxy(addr string, port int) (net.Conn, error) {
-	// Create a SOCKS5 proxy dialer
-	dialer, err := proxy.SOCKS5("tcp", ParseProxy(), nil, proxy.Direct)
-	if err != nil {
-		fmt.Println("Failed to create proxy dialer:", err)
-		return nil, err
+	if config.ProxyType == "socks5" {
+		// Create a SOCKS5 proxy dialer
+		dialer, err := proxy.SOCKS5("tcp", ParseProxy(), nil, proxy.Direct)
+		if err != nil {
+			fmt.Println("Failed to create proxy dialer:", err)
+			return nil, err
+		}
+
+		// Connect to the SOCKS5 proxy
+		proxyConn, err := dialer.Dial("tcp", net.JoinHostPort(addr, strconv.Itoa(port)))
+		if err != nil {
+			fmt.Println("Failed to connect to the SOCKS5 proxy:", err)
+			return nil, err
+		}
+
+		return proxyConn, nil
+	} else if config.ProxyType == "https" {
+		// Create a connection to the proxy server
+		proxyConn, err := net.Dial("tcp", ParseProxy())
+		if err != nil {
+			PrintError(config.ProxyIP, "", err)
+			return nil, err
+		}
+		defer proxyConn.Close()
+
+		// Base64 encode the proxy credentials
+		auth := base64.StdEncoding.EncodeToString([]byte(config.ProxyUsername + ":" + config.ProxyPassword))
+
+		// Send the CONNECT request with proxy authentication
+		_, err = proxyConn.Write([]byte(fmt.Sprintf("CONNECT %s HTTP/1.1\r\n"+
+			"Host: %s\r\n"+
+			"Proxy-Authorization: Basic %s\r\n"+
+			"\r\n", addr+":"+string(port), addr, auth)))
+		if err != nil {
+			PrintError(config.ProxyIP, "", err)
+			return nil, err
+		}
+
+		// Read the proxy server's response
+		response := make([]byte, 4096)
+		_, err = proxyConn.Read(response)
+		if err != nil {
+			PrintError(config.ProxyIP, "", err)
+			return nil, err
+		}
+
+		return proxyConn, nil
 	}
 
-	// Connect to the SOCKS5 proxy
-	proxyConn, err := dialer.Dial("tcp", net.JoinHostPort(addr, strconv.Itoa(port)))
-	if err != nil {
-		fmt.Println("Failed to connect to the SOCKS5 proxy:", err)
-		return nil, err
-	}
-
-	return proxyConn, nil
+	return nil, errors.New("unknown proxy type")
 }
 
 // SendHTTPTraffic Send HTTP GET request and get response

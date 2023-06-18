@@ -1,15 +1,15 @@
 package dns_tester
 
 type DNSResult struct {
-	publicDNS    int
-	dnsOverTLS   int
-	dnsWhitelist int
+	PublicDNS    int `json:"public_dns,omitempty"`
+	DnsOverTLS   int `json:"dns_over_tls,omitempty"`
+	DnsWhitelist int `json:"dns_whitelist,omitempty"`
 }
 
 func TestDNS(ip string, domain string) DNSResult {
 	return DNSResult{
-		publicDNS:    -5,
-		dnsOverTLS:   -5,
-		dnsWhitelist: -5,
+		PublicDNS:    -5,
+		DnsOverTLS:   -5,
+		DnsWhitelist: -5,
 	}
 }

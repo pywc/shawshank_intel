@@ -5,15 +5,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="Throttle tester done + test structure part 1">
-      <change afterPath="$PROJECT_DIR$/util/brightdata.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/dns_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/dns_tester/tester.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/tester.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/02_esni.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/02_esni.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/04_blindtls.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/04_blindtls.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/generators.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/generators.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/sender.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/tester.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/quic_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/quic_tester/tester.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/brightdata.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/connection.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/connection.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/geolocator.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/geolocator.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/ip_resolver.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/ip_resolver.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/misc.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/misc.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/proxy_tools.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/proxy_tools.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/throttle_helper.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/throttle_tester/throttle_helper.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +75,7 @@
     "last_opened_file_path": "/Users/pywchung/go/Shawshank",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "go.vgo"
   },
   "keyToStringList": {
@@ -75,6 +89,8 @@
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/testers/throttle_tester" />
+      <recent name="$PROJECT_DIR$/db" />
       <recent name="$PROJECT_DIR$/util" />
     </key>
   </component>

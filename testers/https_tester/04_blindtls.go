@@ -46,7 +46,7 @@ func CheckTLS12Resumption(domain string, ip string) (int, error) {
 		} else if strings.Contains(err.Error(), "i/o timeout") {
 			// connection timeout
 			return 3, nil
-		} else if strings.Contains(err.Error(), "certificate is valid for") {
+		} else if strings.Contains(err.Error(), "Certificate is valid for") {
 			return 5, nil
 		} else {
 			// unknown error

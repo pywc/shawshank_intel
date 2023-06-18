@@ -24,7 +24,7 @@ type FilteredHTTPS struct {
 	2: refused
 	3: silent drop
 	4: TODO: throttle
-	5: invalid certificate
+	5: invalid Certificate
 */
 func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig *utls.Config) (int, string, error) {
 	// Fetch via proxy
@@ -67,7 +67,7 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 		} else if strings.Contains(err.Error(), "i/o timeout") {
 			// connection timeout
 			return 3, "", nil
-		} else if strings.Contains(err.Error(), "certificate is valid for") {
+		} else if strings.Contains(err.Error(), "Certificate is valid for") {
 			return 5, "", nil
 		} else {
 			// unknown error
@@ -89,7 +89,7 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 	2: refused
 	3: silent drop
 	4: TODO: throttle
-	5: invalid certificate
+	5: invalid Certificate
 */
 func SendHTTPSRequestCustom(domain string, ip string, port int,
 	req string, extensions []utls.TLSExtension) (int, string, error) {
@@ -139,7 +139,7 @@ func SendHTTPSRequestCustom(domain string, ip string, port int,
 		} else if strings.Contains(err.Error(), "i/o timeout") {
 			// connection timeout
 			return 3, "", nil
-		} else if strings.Contains(err.Error(), "certificate is valid for") {
+		} else if strings.Contains(err.Error(), "Certificate is valid for") {
 			return 5, "", nil
 		} else {
 			// unknown error
