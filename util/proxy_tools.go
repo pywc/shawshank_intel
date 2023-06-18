@@ -12,7 +12,7 @@ func SetProxy(ip string, port int, username string, password string) {
 	config.ProxyPassword = password
 }
 
-func ParseProxyFull(remoteDNS bool) string {
+func ParseSOCKS5ProxyFull(remoteDNS bool) string {
 	result := "socks5"
 
 	if remoteDNS == true {
