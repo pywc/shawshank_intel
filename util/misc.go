@@ -1,5 +1,7 @@
 package util
 
+import "log"
+
 func Reverse(s string) string {
 	runes := []rune(s)
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
@@ -14,4 +16,8 @@ func Repeat(s string, n int) string {
 		returnString += s
 	}
 	return returnString
+}
+
+func PrintError(proxyIP string, domain string, err error) {
+	log.Println(proxyIP + " - " + err.Error() + " - " + domain)
 }

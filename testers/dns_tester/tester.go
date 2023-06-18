@@ -5,3 +5,11 @@ type DNSResult struct {
 	dnsOverTLS   int
 	dnsWhitelist int
 }
+
+func TestDNS(ip string, domain string) DNSResult {
+	return DNSResult{
+		publicDNS:    -5,
+		dnsOverTLS:   -5,
+		dnsWhitelist: -5,
+	}
+}
