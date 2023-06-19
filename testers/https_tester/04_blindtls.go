@@ -31,7 +31,7 @@ func CheckTLS12Resumption(domain string, ip string) (int, error) {
 		return -10, err
 	}
 
-	conn, err = util.ConnectViaProxy(ip, 443)
+	conn, err = util.ConnectViaProxy(ip, 443, "https")
 	resp, err := util.ResumeTLSSession(conn, req, *sess)
 	conn.Close()
 

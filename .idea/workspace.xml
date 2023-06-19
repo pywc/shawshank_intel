@@ -4,29 +4,32 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="Throttle tester done + test structure part 1">
+    <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="Resolved circular dependency">
+      <change afterPath="$PROJECT_DIR$/proxies.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/dns_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/dns_tester/tester.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/02_html_title.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/02_html_title.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/generators.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/generators.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/http_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/sender.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/tester.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/02_esni.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/02_esni.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/https_tester/04_blindtls.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/04_blindtls.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/06_cenfuzz.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/06_cenfuzz.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/https_tester/generators.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/generators.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/https_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/sender.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/tester.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/quic_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/quic_tester/tester.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/brightdata.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/ip_tester/00_port.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/ip_tester/00_port.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/connection.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/connection.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/geolocator.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/geolocator.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/ip_resolver.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/ip_resolver.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/misc.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/misc.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/proxy_tools.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/proxy_tools.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/throttle_helper.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/throttle_tester/throttle_helper.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/residual_detector.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/residual_detector.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +54,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectId" id="2QGn12kjVZ6FVmIT9U6kz8Fe1Qp" />
   <component name="ProjectLevelVcsManager">
@@ -71,6 +74,7 @@
     "RunOnceActivity.go.migrated.go.modules.settings": "true",
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
     "last_opened_file_path": "/Users/pywchung/go/Shawshank",
     "node.js.detected.package.eslint": "true",
@@ -139,7 +143,8 @@
     <MESSAGE value="HTTP Cenfuzz implementation done" />
     <MESSAGE value="HTTPS Cenfuzz implementation done" />
     <MESSAGE value="Throttle tester done + test structure part 1" />
-    <option name="LAST_COMMIT_MESSAGE" value="Throttle tester done + test structure part 1" />
+    <MESSAGE value="Resolved circular dependency" />
+    <option name="LAST_COMMIT_MESSAGE" value="Resolved circular dependency" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

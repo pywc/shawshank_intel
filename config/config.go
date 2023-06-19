@@ -19,7 +19,7 @@ var ResidualTestThreshold float64 = 600
 
 // HTTP Test Configuration
 var EchoServerAddr string = "35.188.143.33"
-var EchoServerPort int = 8008
+var EchoServerPort int = 8010
 var MagicWord string = "somethingsSpeciale"
 
 // HTTPS Test Configuration
@@ -30,7 +30,7 @@ var ESNIIP = "104.16.123.96"
 
 // For both HTTP and HTTPS
 func DomainWildcards(domain string) []string {
-	testList := make([]string, 7)
+	testList := make([]string, 0)
 	testList = append(testList, domain)
 	testList = append(testList, "abc123qwezxc."+domain)
 	testList = append(testList, "*."+domain)

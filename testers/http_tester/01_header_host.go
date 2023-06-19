@@ -2,8 +2,10 @@ package http_tester
 
 import (
 	"github.com/pywc/shawshank_intel/config"
+	"github.com/pywc/shawshank_intel/util"
 	"log"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -21,8 +23,16 @@ func CheckHTTPHeaderHost(domain string) (int, []FilteredHTTP) {
 	filteredList := make([]FilteredHTTP, len(testList))
 
 	for _, testDomain := range testList {
-		req := "POST / HTTP/1.1\r\nHost: " + testDomain + "\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"
-		req += "magicWord=" + url.QueryEscape(config.MagicWord)
+		reqBody := "magicWord=" + url.QueryEscape(config.MagicWord) + "\r\n"
+		req := "POST http://" + config.EchoServerAddr + " HTTP/1.1\r\n" +
+			"Host: " + testDomain + "\r\n" +
+			"Content-Type: application/x-www-form-urlencoded\r\n" +
+			"Content-Length: " + strconv.Itoa(len(reqBody)) + "\r\n"
+		if config.ProxyUsername != "" {
+			req += "Proxy-Authorization: " + util.ParseAuth() + "\r\n"
+		}
+		req += "\r\n"
+		req += reqBody
 		resultCode, resp, redirectURL, err := SendHTTPRequest(config.EchoServerAddr, config.EchoServerAddr, config.EchoServerPort, req)
 		if resultCode == 0 {
 			continue
@@ -39,6 +49,7 @@ func CheckHTTPHeaderHost(domain string) (int, []FilteredHTTP) {
 			redirectURL: redirectURL,
 		}
 
+		util.PrintInfo(domain, "header host result for "+testDomain+": "+strconv.Itoa(resultCode))
 		filteredList = append(filteredList, filtered)
 	}
 

@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/testers/dns_tester"
 	"github.com/pywc/shawshank_intel/testers/http_tester"
@@ -23,26 +25,24 @@ type TestReport struct {
 	quic       quic_tester.QUICResult
 }
 
-func TestDomain(country string, domain string) {
-	util.PrintInfo(domain, "start testing...")
-
-	hostIP, err := util.ResolveIPLocally(domain)
-	if err != nil {
-		return
-	}
+func TestDomain(country string, domain string, ip string) {
+	util.PrintInfo(domain, "initiating tests...")
 
 	report := TestReport{
 		country:    country,
 		proxyIP:    config.ProxyIP,
 		hostDomain: domain,
-		hostIP:     hostIP,
-		dns:        dns_tester.TestDNS("", domain),
-		http:       http_tester.TestHTTP("", domain),
-		https:      https_tester.TestHTTPS("", domain),
-		quic:       quic_tester.TestQUIC("", domain),
+		hostIP:     ip,
+		dns:        dns_tester.TestDNS(ip, domain),
+		http:       http_tester.TestHTTP(ip, domain),
+		https:      https_tester.TestHTTPS(ip, domain),
+		quic:       quic_tester.TestQUIC(ip, domain),
 	}
 
-	err = saveToDB(report)
+	j, _ := json.Marshal(report)
+	fmt.Println(string(j))
+
+	err := saveToDB(report)
 	if err != nil {
 		return
 	}

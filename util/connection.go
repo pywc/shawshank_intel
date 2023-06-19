@@ -3,7 +3,6 @@ package util
 import (
 	"bufio"
 	"crypto/x509"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"github.com/pywc/shawshank_intel/config"
@@ -28,7 +27,7 @@ func ConnectNormally(addr string, port int) (net.Conn, error) {
 }
 
 // ConnectViaProxy Connect to the address through the proxy
-func ConnectViaProxy(addr string, port int) (net.Conn, error) {
+func ConnectViaProxy(addr string, port int, connectType string) (net.Conn, error) {
 	if config.ProxyType == "socks5" {
 		// Create a SOCKS5 proxy dialer
 		dialer, err := proxy.SOCKS5("tcp", ParseProxy(), nil, proxy.Direct)
@@ -52,16 +51,29 @@ func ConnectViaProxy(addr string, port int) (net.Conn, error) {
 			PrintError(config.ProxyIP, "", err)
 			return nil, err
 		}
-		defer proxyConn.Close()
 
-		// Base64 encode the proxy credentials
-		auth := base64.StdEncoding.EncodeToString([]byte(config.ProxyUsername + ":" + config.ProxyPassword))
+		if connectType != "https" {
+			return proxyConn, nil
+		}
 
 		// Send the CONNECT request with proxy authentication
-		_, err = proxyConn.Write([]byte(fmt.Sprintf("CONNECT %s HTTP/1.1\r\n"+
-			"Host: %s\r\n"+
-			"Proxy-Authorization: Basic %s\r\n"+
-			"\r\n", addr+":"+string(port), addr, auth)))
+		req := ""
+
+		if config.ProxyUsername != "" {
+			req = "CONNECT " + addr + " HTTP/1.1\r\n" +
+				"Host: " + addr + ":" + strconv.Itoa(port) + "\r\n" +
+				"Proxy-Authorization: Basic " + ParseAuth() + "\r\n" +
+				"Proxy-Connection: keep-alive\r\n" +
+				"\r\n"
+			_, err = proxyConn.Write([]byte(req))
+		} else {
+			req = "CONNECT " + addr + " HTTP/1.1\r\n" +
+				"Host: " + addr + ":" + strconv.Itoa(port) + "\r\n" +
+				"Proxy-Connection: keep-alive\r\n" +
+				"\r\n"
+			_, err = proxyConn.Write([]byte(req))
+		}
+
 		if err != nil {
 			PrintError(config.ProxyIP, "", err)
 			return nil, err
@@ -92,6 +104,7 @@ func SendHTTPTraffic(conn net.Conn, request string) (*http.Response, error) {
 	// Read the response
 	response, err := http.ReadResponse(bufio.NewReader(conn), nil)
 	if err != nil {
+		fmt.Println("Failed to read response")
 		return nil, err
 	}
 

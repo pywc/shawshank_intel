@@ -6,14 +6,19 @@ import (
 	"github.com/pywc/shawshank_intel/db"
 	"github.com/pywc/shawshank_intel/util"
 	"log"
+	"os"
 	"strconv"
 )
 
 func main() {
+	if len(os.Args) < 2 {
+		log.Println("usage: ./main.go <PROXY_CSV>")
+		return
+	}
 
 	log.Println("Welcome to Shawshank Intel!")
 
-	proxyList, err := util.FetchProxy("data/proxies.csv")
+	proxyList, err := util.FetchProxy(os.Args[1])
 	if err != nil {
 		return
 	}
@@ -39,7 +44,12 @@ func main() {
 
 		// test for each domain
 		for _, domain := range testList {
-			db.TestDomain(countryCode, domain)
+			ip, err := util.ResolveIPLocally(domain)
+			if err != nil {
+				continue
+			}
+
+			db.TestDomain(countryCode, domain, ip)
 		}
 	}
 }

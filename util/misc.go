@@ -52,7 +52,7 @@ func Repeat(s string, n int) string {
 }
 
 func PrintError(proxyIP string, domain string, err error) {
-	log.Println(proxyIP + " - " + err.Error() + " - " + domain)
+	log.Println("Error: " + proxyIP + " - " + domain + " - " + err.Error())
 }
 
 func PrintInfo(domain string, info string) {
