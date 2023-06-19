@@ -52,7 +52,7 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 	}
 
 	// Fetch via proxy
-	conn, err = util.ConnectViaProxy(ip, port)
+	conn, err = util.ConnectViaProxy(ip, port, "http")
 	if err != nil {
 		if strings.Contains(err.Error(), "general SOCKS server failure") {
 			// cannot connect to proxy
@@ -81,7 +81,7 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 			return 3, "", "", nil
 		} else {
 			// unknown error
-			return -10, "", "", nil
+			return -10, "", "", err
 		}
 	}
 

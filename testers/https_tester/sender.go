@@ -28,7 +28,7 @@ type FilteredHTTPS struct {
 */
 func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig *utls.Config) (int, string, error) {
 	// Fetch via proxy
-	conn, err := util.ConnectViaProxy(ip, port)
+	conn, err := util.ConnectViaProxy(ip, port, "https")
 
 	if err != nil {
 		if strings.Contains(err.Error(), "general SOCKS server failure") {
@@ -37,7 +37,7 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 		} else if ip == config.DummyServerIP {
 			// residual censorship detection mode
 			util.DetectResidual(ip, port, "https")
-			conn, err = util.ConnectViaProxy(ip, port)
+			conn, err = util.ConnectViaProxy(ip, port, "https")
 			if err != nil {
 				return -10, "", err
 			}
@@ -94,7 +94,7 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 func SendHTTPSRequestCustom(domain string, ip string, port int,
 	req string, extensions []utls.TLSExtension) (int, string, error) {
 	// Fetch via proxy
-	conn, err := util.ConnectViaProxy(ip, port)
+	conn, err := util.ConnectViaProxy(ip, port, "https")
 
 	if err != nil {
 		if strings.Contains(err.Error(), "general SOCKS server failure") {
@@ -103,7 +103,7 @@ func SendHTTPSRequestCustom(domain string, ip string, port int,
 		} else if ip == config.ESNIIP {
 			// residual censorship detection mode
 			util.DetectResidual(ip, port, "https")
-			conn, err = util.ConnectViaProxy(ip, port)
+			conn, err = util.ConnectViaProxy(ip, port, "https")
 			if err != nil {
 				return -10, "", err
 			}

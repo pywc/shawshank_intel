@@ -6,7 +6,7 @@ import (
 )
 
 func TestPort(ip string, port int) int {
-	conn, err := util.ConnectViaProxy(ip, port)
+	conn, err := util.ConnectViaProxy(ip, port, "ip")
 	defer conn.Close()
 
 	if err != nil {

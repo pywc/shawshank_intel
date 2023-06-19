@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jpillora/go-tld"
 	combinations "github.com/mxschmitt/golang-combinations"
+	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/util"
 	"log"
 	"math/rand"
@@ -72,7 +73,10 @@ func FormatHttpRequest(requestWord RequestWord) string {
 		} else if hostNameParts[1] == "reverse" {
 			host = util.Reverse(hostNameParts[0])
 		} else if hostNameParts[1] == "tld" {
-			domainParts, _ := tld.Parse("https://" + hostNameParts[0])
+			domainParts, err := tld.Parse("https://" + hostNameParts[0])
+			if err != nil {
+				util.PrintError(config.ProxyIP, "", err)
+			}
 			if domainParts.Subdomain != "" {
 				host = domainParts.Subdomain + "." + domainParts.Domain + "." + hostNameParts[2]
 			} else {
@@ -86,7 +90,11 @@ func FormatHttpRequest(requestWord RequestWord) string {
 		host = requestWord.Hostname
 	}
 
-	format := "%s%s%s%s%s%s\r\n%s\r\n"
+	format := "%s%s%s%s%s%s\r\n%s"
+	if config.ProxyUsername != "" {
+		format += "Proxy-Authorization: " + util.ParseAuth() + "\r\n"
+	}
+	format += "\r\n"
 	return fmt.Sprintf(format, getWord, path, httpWord, httpDelimiterWord, hostWord, host, header)
 }
 
@@ -222,14 +230,19 @@ func GenerateAllHostAlternatives() []string {
 	return GenerateAllAlternatives(HostAlternatives)
 }
 
-var PathAlternatives = []string{"/ ", " z ", " ? ", " ", " /", "**", " /x", "x/ "}
+var PathAlternatives = []string{" http://%s/ ", " http://%s/z ", " http://%s/? ", " http://%s ", " http://%s/", " http://%s**", " http://%s/x", " http://%s/x/ "}
 
 func GeneratePathAlternatives() string {
 	return GenerateAlternatives(PathAlternatives)
 }
 
-func GenerateAllPathAlternatives() []string {
-	return GenerateAllAlternatives(PathAlternatives)
+func GenerateAllPathAlternatives(hostname string) []string {
+	allAlternatives := GenerateAllAlternatives(PathAlternatives)
+	for i, alt := range allAlternatives {
+		allAlternatives[i] = fmt.Sprintf(alt, hostname)
+	}
+
+	return allAlternatives
 }
 
 var HTTPHeaders = []string{"Accept: text/html", "Accept: application/xml", "Accept: text/html,application/xhtml+xml", "Accept: application/json", "Accept: xxx", "Accept-Charset: utf-8", "Accept-Charset: xxx", "Accept-Datetime: Thu, 31 May 2007 20:35:00 GMT", "Accept-Datetime: xxx", "Accept-Encoding: gzip, deflate", "Accept-Encoding: xxx", "Accept-Language: en-US", "Accept-Language: xxx", "Access-Control-Request-Method: GET", "Access-Control-Request-Method: xxx", "Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==", "Cache-Control: no-cache", "Cache-Control: xxx", "Connection: keep-alive", "Connection: xxx", "Content-Encoding: gzip", "Content-Encoding: xxx", "Content-Length: 1000", "Content-MD5: Q2hlY2sgSW50ZWdyaXR5IQ==", "Content-Type: application/x-www-form-urlencoded", "Content-Type: xxx", "Cookie: $Version=1; Skin=new;", "Cookie: xxx", "Date: Tue, 15 Nov 1994 08:12:31 GMT", "Expect: 100-continue", "Expect: xxx", "From: user@example.com", "If-Match: \"737060cd8c284d8af7ad3082f209582d\"", "If-Modified-Since: Sat, 29 Oct 1994 19:43:31 GMT", "If-None-Match: \"737060cd8c284d8af7ad3082f209582d]\"", "If-Range: \"737060cd8c284d8af7ad3082f209582d\"", "If-Unmodified-Since: Sat, 29 Oct 1994 19:43:31 GMT", "Max-Forwards: 10", "Max-Forwards: xxx", "Origin: http://www.example-xxx.com", "Pragma: no-cache", "Pragma: xxx", "Prefer: return=representation", "Prefer: xxx", "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==", "Range: bytes=500-999", "Referer: http://example-xxx.com", "TE: trailers, deflate", "Trailer: Max-Forwards", "Trailer: xxx", "Transfer-Encoding: chunked", "Transfer-Encoding: xxx", "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0", "User-Agent: xxx", "Upgrade: h2c, HTTPS/1.3, IRC/6.9, RTA/x11, websocket", "Upgrade: xxx", "Via: 1.0 fred, 1.1 example-xxx.com (Apache/1.1)", "Warning: 199 Miscellaneous warning", "Warning: xxx"}
@@ -255,11 +268,10 @@ func GenerateTLDAlternatives() string {
 }
 
 func GenerateAllTLDAlternatives(hostname string) []string {
-	u, _ := tld.Parse("https://" + hostname)
 	tldAlternatives := GenerateAllAlternatives(TLDs)
 
 	for i, alt := range tldAlternatives {
-		tldAlternatives[i] = fmt.Sprintf(alt, u.Domain)
+		tldAlternatives[i] = fmt.Sprintf(alt, hostname)
 	}
 
 	return tldAlternatives

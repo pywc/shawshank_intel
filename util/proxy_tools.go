@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/base64"
 	"github.com/pywc/shawshank_intel/config"
 	"log"
 	"strconv"
@@ -47,6 +48,11 @@ func ParseProxy() string {
 	return result
 }
 
+func ParseAuth() string {
+	auth := base64.StdEncoding.EncodeToString([]byte(config.ProxyUsername + ":" + config.ProxyPassword))
+	return auth
+}
+
 func FetchProxy(path string) ([][]string, error) {
 	log.Println("Fetching proxies...")
 	data, err := ReadCsvFile(path)
@@ -55,7 +61,7 @@ func FetchProxy(path string) ([][]string, error) {
 		return nil, err
 	}
 
-	log.Println("Fetched " + string(len(data)) + " proxies")
+	log.Println("Fetched " + strconv.Itoa(len(data)-1) + " proxies")
 
-	return data, nil
+	return data[1:], nil
 }

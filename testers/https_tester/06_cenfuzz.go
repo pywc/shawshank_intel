@@ -2,9 +2,28 @@ package https_tester
 
 import (
 	"github.com/pywc/shawshank_intel/testers/http_tester"
+	"github.com/pywc/shawshank_intel/util"
 	utls "github.com/refraction-networking/utls"
+	"log"
 	"strconv"
 )
+
+func FuzzSender(hostname string, ip string, req string, component string, utlsConfig *utls.Config) *FilteredHTTPS {
+	resultCode, _, err := SendHTTPSRequest(hostname, ip, 443, req, utlsConfig)
+	util.PrintInfo(hostname, component+" result: "+strconv.Itoa(resultCode))
+	if resultCode == 0 {
+		return nil
+	} else if resultCode == -10 {
+		log.Println("[*] Error - " + hostname + " - " + err.Error())
+	}
+
+	filtered := FilteredHTTPS{
+		component:  component,
+		resultCode: resultCode,
+	}
+
+	return &filtered
+}
 
 func CheckServerNamePadding(hostname string, ip string) []FilteredHTTPS {
 	serverNameAllPadding := GenerateAllHostNamePaddings(hostname)

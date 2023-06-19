@@ -1,6 +1,9 @@
 package http_tester
 
-import "github.com/pywc/shawshank_intel/util"
+import (
+	"github.com/pywc/shawshank_intel/config"
+	"github.com/pywc/shawshank_intel/util"
+)
 
 type HTTPResult struct {
 	Connectivity         HTTPConnectivityResult `json:"connectivity"`
@@ -29,24 +32,31 @@ func TestHTTP(ip string, domain string) HTTPResult {
 	util.PrintInfo(domain, "testing HTTP...")
 	result := HTTPResult{}
 	result.Connectivity = CheckHTTPConnectivity(domain, ip)
-	if result.Connectivity.resultCode == 0 {
+	if result.Connectivity.resultCode == 0 || result.Connectivity.resultCode == -10 {
 		return result
 	}
 
 	_, result.HeaderHost = CheckHTTPHeaderHost(domain)
 	result.HtmlTitle = CheckHTMLTitle(domain)
 	result.HtmlTokens, _ = CheckHTMLTokens(domain)
-	result.HostnamePadding = CheckHostnamePadding(domain, ip)
-	result.GetCapitalize = CheckGetWordCapitalize(domain, ip)
-	result.GetRemove = CheckGetWordRemove(domain, ip)
-	result.GetAlternate = CheckGetWordAlternate(domain, ip)
-	result.HttpCapitalize = CheckHTTPWordCapitalize(domain, ip)
-	result.HttpRemove = CheckHTTPWordRemove(domain, ip)
-	result.HttpAlternate = CheckHTTPWordAlternate(domain, ip)
-	result.HostCapitalize = CheckHostWordCapitalize(domain, ip)
-	result.HostRemove = CheckHostWordRemove(domain, ip)
-	result.HostAlternate = CheckHostWordAlternate(domain, ip)
-	result.HttpDelimiterRemove = CheckHTTPDelimiterWordRemove(domain, ip)
+
+	util.PrintInfo(domain, "Initiating cenfuzz drivers...")
+
+	if config.ProxyType != "https" {
+		result.HostnamePadding = CheckHostnamePadding(domain, ip)
+		result.GetCapitalize = CheckGetWordCapitalize(domain, ip)
+		result.GetRemove = CheckGetWordRemove(domain, ip)
+		result.GetAlternate = CheckGetWordAlternate(domain, ip)
+		result.HttpCapitalize = CheckHTTPWordCapitalize(domain, ip)
+		result.HttpRemove = CheckHTTPWordRemove(domain, ip)
+		result.HttpAlternate = CheckHTTPWordAlternate(domain, ip)
+		result.HostCapitalize = CheckHostWordCapitalize(domain, ip)
+		result.HostRemove = CheckHostWordRemove(domain, ip)
+		result.HostAlternate = CheckHostWordAlternate(domain, ip)
+		result.HttpDelimiterRemove = CheckHTTPDelimiterWordRemove(domain, ip)
+	}
+	
+	result.HeaderAlternate = CheckHeaderAlternate(domain, ip)
 	result.PathAlternate = CheckPathAlternate(domain, ip)
 	result.HostnameAlternate = CheckHostnameAlternate(domain, ip)
 	result.HostnameTLDAlternate = CheckHostnameTLDAlternate(domain, ip)

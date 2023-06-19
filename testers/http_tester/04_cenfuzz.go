@@ -1,11 +1,14 @@
 package http_tester
 
 import (
+	"github.com/pywc/shawshank_intel/util"
 	"log"
+	"strconv"
 )
 
 func FuzzSender(hostname string, ip string, req string, component string) *FilteredHTTP {
 	resultCode, _, redirectURL, err := SendHTTPRequest(hostname, ip, 80, req)
+	util.PrintInfo(hostname, component+" result: "+strconv.Itoa(resultCode))
 	if resultCode == 0 {
 		return nil
 	} else if resultCode == -10 {
@@ -263,7 +266,7 @@ func CheckHTTPDelimiterWordRemove(hostname string, ip string) []FilteredHTTP {
 }
 
 func CheckPathAlternate(hostname string, ip string) []FilteredHTTP {
-	pathAllAlternate := GenerateAllPathAlternatives()
+	pathAllAlternate := GenerateAllPathAlternatives(hostname)
 	filteredList := make([]FilteredHTTP, len(pathAllAlternate))
 
 	for _, testComponent := range pathAllAlternate {

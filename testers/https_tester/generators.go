@@ -29,22 +29,6 @@ type RequestWord struct {
 	Certificate  []utls.Certificate
 }
 
-func FuzzSender(hostname string, ip string, req string, component string, utlsConfig *utls.Config) *FilteredHTTPS {
-	resultCode, _, err := SendHTTPSRequest(hostname, ip, 443, req, utlsConfig)
-	if resultCode == 0 {
-		return nil
-	} else if resultCode == -10 {
-		log.Println("[*] Error - " + hostname + " - " + err.Error())
-	}
-
-	filtered := FilteredHTTPS{
-		component:  component,
-		resultCode: resultCode,
-	}
-
-	return &filtered
-}
-
 // Returns of an HTTP request for URL.
 func CreateTLSConfig(requestWord RequestWord) *utls.Config {
 	//Set max version to TLS 1.2 if we want cipher suites to be configurable. TLS 1.3 cipher suites are not configurable
@@ -386,11 +370,10 @@ func GenerateSubdomainsAlternatives() string {
 }
 
 func GenerateAllSubdomainsAlternatives(hostname string) []string {
-	u, _ := tld.Parse("https://" + hostname)
 	subdomainAlternatives := GenerateAllAlternatives(Subdomains)
 
 	for i, alt := range subdomainAlternatives {
-		subdomainAlternatives[i] = fmt.Sprintf(alt, u.Domain+"."+u.TLD)
+		subdomainAlternatives[i] = fmt.Sprintf(alt, hostname)
 	}
 
 	return subdomainAlternatives

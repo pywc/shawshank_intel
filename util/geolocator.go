@@ -1,8 +1,11 @@
 package util
 
 import (
+	"errors"
+	"github.com/pywc/shawshank_intel/config"
 	"log"
 	"net/url"
+	"strconv"
 )
 
 // TODO: implement maxmind geolocator
@@ -13,9 +16,12 @@ func GetCountry(ip string) string {
 func GetTestDomains(countryCode string) ([]string, error) {
 	log.Println("Fetching test domains...")
 
-	testList := make([]string, 0)
-
 	data, err := ReadCsvFile("./test-lists/lists/" + countryCode + ".csv")
+	if err != nil {
+		PrintError(config.ProxyIP, "", errors.New("failed to load test list"))
+		return nil, err
+	}
+	data = data[1:]
 
 	urlList := make([]string, 0)
 	for _, row := range data {
@@ -25,7 +31,7 @@ func GetTestDomains(countryCode string) ([]string, error) {
 
 	urlList = RemoveDuplicateStr(urlList)
 
-	log.Println("Fetched " + string(len(urlList)) + " domains")
+	log.Println("Fetched " + strconv.Itoa(len(urlList)) + " domains")
 
-	return testList, err
+	return urlList, nil
 }

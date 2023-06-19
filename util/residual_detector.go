@@ -21,7 +21,7 @@ func DetectResidual(ip string, port int, component string) (int, float64) {
 		2: destination ip + port
 	*/
 	// test 0
-	conn, err := ConnectViaProxy(ip, port)
+	conn, err := ConnectViaProxy(ip, port, component)
 	if err == nil {
 		conn.Close()
 		return 0, 0.0
@@ -32,14 +32,14 @@ func DetectResidual(ip string, port int, component string) (int, float64) {
 	if port == 80 {
 		newPort = 443
 	}
-	conn, err = ConnectViaProxy(ip, newPort)
+	conn, err = ConnectViaProxy(ip, newPort, component)
 	if err != nil {
 		startTime := time.Now()
 		endTime := time.Now()
 		duration := 0.0
 
 		for {
-			conn, err := ConnectViaProxy(ip, newPort)
+			conn, err := ConnectViaProxy(ip, newPort, component)
 			endTime = time.Now()
 			duration = float64(endTime.UnixMilli()-startTime.UnixMilli()) / 1000
 
@@ -64,14 +64,14 @@ func DetectResidual(ip string, port int, component string) (int, float64) {
 	}
 
 	// test 2
-	conn, err = ConnectViaProxy(ip, port)
+	conn, err = ConnectViaProxy(ip, port, component)
 	if err != nil {
 		startTime := time.Now()
 		endTime := time.Now()
 		duration := 0.0
 
 		for {
-			conn, err := ConnectViaProxy(ip, port)
+			conn, err := ConnectViaProxy(ip, port, component)
 			endTime = time.Now()
 			duration = float64(endTime.UnixMilli()-startTime.UnixMilli()) / 1000
 

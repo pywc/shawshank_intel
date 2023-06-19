@@ -2,10 +2,12 @@ package http_tester
 
 import (
 	"github.com/pywc/shawshank_intel/config"
+	"github.com/pywc/shawshank_intel/util"
 	"golang.org/x/net/html"
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -55,8 +57,16 @@ func CheckHTMLTitle(domain string) HTTPConnectivityResult {
 
 	// Send the title under <title> to echo server
 	html := "<html><head><title>" + title + "</title></head><body>" + config.MagicWord + "</body></html>"
-	req := "POST / HTTP/1.1\r\nHost: " + config.EchoServerAddr + "\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n"
-	req += "magicWord=" + url.QueryEscape(html)
+	reqBody := "magicWord=" + url.QueryEscape(html)
+	req := "POST http://" + config.EchoServerAddr + " HTTP/1.1\r\n" +
+		"Host: " + config.EchoServerAddr + "\r\n" +
+		"Content-Type: application/x-www-form-urlencoded\r\n" +
+		"Content-Length: " + strconv.Itoa(len(reqBody)) + "\r\n"
+	if config.ProxyUsername != "" {
+		req += "Proxy-Authorization: " + util.ParseAuth() + "\r\n"
+	}
+	req += "\r\n"
+	req += reqBody
 	resultCode, respEcho, redirectURL, err := SendHTTPRequest(config.EchoServerAddr, config.EchoServerAddr, config.EchoServerPort, req)
 	if resultCode == -10 {
 		log.Println("[*] Error - " + domain + " - " + err.Error())
@@ -66,6 +76,8 @@ func CheckHTMLTitle(domain string) HTTPConnectivityResult {
 		resultCode = 399
 		redirectURL = "unknown"
 	}
+
+	util.PrintInfo(domain, "html title result for "+title+": "+strconv.Itoa(resultCode))
 
 	return HTTPConnectivityResult{
 		resultCode:  resultCode,
