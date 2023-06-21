@@ -9,8 +9,8 @@ import (
 )
 
 type FilteredHTTPS struct {
-	component  string
-	resultCode int
+	Component  string `json:"component,omitempty"`
+	ResultCode int    `json:"result_code,omitempty"`
 }
 
 // SendHTTPSRequest Returns result_code, response_body
@@ -49,15 +49,6 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 
 	resp, err := util.SendHTTPSTraffic(conn, req, utlsConfig, nil, utls.HelloGolang)
 	if err != nil {
-		return -10, "", err
-	}
-
-	respBody, err := io.ReadAll(resp.Body)
-	resp.Body.Close()
-	conn.Close()
-
-	// check tcp errors
-	if err != nil {
 		if strings.Contains(err.Error(), "connection reset by peer") {
 			// connection reset
 			return 1, "", nil
@@ -71,8 +62,20 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 			return 5, "", nil
 		} else {
 			// unknown error
+			util.PrintError(domain, err)
 			return -10, "", err
 		}
+	}
+
+	respBody, err := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	conn.Close()
+
+	// check tcp errors
+	if err != nil {
+		// unknown error
+		util.PrintError(domain, err)
+		return -10, "", err
 	}
 
 	return 0, string(respBody), nil

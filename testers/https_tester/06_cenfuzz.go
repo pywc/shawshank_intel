@@ -18,8 +18,8 @@ func FuzzSender(hostname string, ip string, req string, component string, utlsCo
 	}
 
 	filtered := FilteredHTTPS{
-		component:  component,
-		resultCode: resultCode,
+		Component:  component,
+		ResultCode: resultCode,
 	}
 
 	return &filtered

@@ -1,7 +1,10 @@
 package config
 
+import "regexp"
+
 // Global Configuration
 var TestCount = 30
+var CurrentComponent = ""
 
 // SOCKS5 Proxy Configuration
 var ProxyIP = "35.188.143.33"
@@ -9,6 +12,8 @@ var ProxyPort = "2408"
 var ProxyUsername = ""
 var ProxyPassword = ""
 var ProxyType = "socks5"
+var ProxyCountry = "us"
+var ProxyISP = "charter"
 
 // Throttle Test Configuration
 var ThrottlePValThreshold = 0.01
@@ -19,12 +24,15 @@ var ResidualTestThreshold float64 = 600
 
 // HTTP Test Configuration
 var EchoServerAddr string = "35.188.143.33"
-var EchoServerPort int = 8010
-var MagicWord string = "somethingsSpeciale"
+var EchoServerPort int = 80
+var MagicWord string = "somethingSpecial"
+var DomainSimilarityThreshold float64 = 0.5
+var NonAlphanumericRegex = regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
 
 // HTTPS Test Configuration
-var DummyServerDomain = "wisc.edu"
-var DummyServerIP = "144.92.9.70"
+// not wisc.edu since it returns handshake failure for some reason
+var DummyServerDomain = "mit.edu"
+var DummyServerIP = "23.64.108.89"
 var ESNIDomain = "www.cloudflare.com"
 var ESNIIP = "104.16.123.96"
 

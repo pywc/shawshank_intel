@@ -8,6 +8,7 @@ import (
 	"github.com/pywc/shawshank_intel/testers/dns_tester"
 	"github.com/pywc/shawshank_intel/testers/http_tester"
 	"github.com/pywc/shawshank_intel/testers/https_tester"
+	"github.com/pywc/shawshank_intel/testers/ip_tester"
 	"github.com/pywc/shawshank_intel/testers/quic_tester"
 	"github.com/pywc/shawshank_intel/util"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,32 +16,34 @@ import (
 )
 
 type TestReport struct {
-	country    string
-	proxyIP    string
-	hostDomain string
-	hostIP     string
-	dns        dns_tester.DNSResult
-	http       http_tester.HTTPResult
-	https      https_tester.HTTPSResult
-	quic       quic_tester.QUICResult
+	Country    string                   `json:"country"`
+	ProxyIP    string                   `json:"proxy_ip"`
+	HostDomain string                   `json:"host_domain"`
+	HostIP     string                   `json:"host_ip"`
+	Residual   []util.ResidualDetected  `json:"residual,omitempty"`
+	DNS        dns_tester.DNSResult     `json:"dns"`
+	IP         ip_tester.IPResult       `json:"ip"`
+	HTTP       http_tester.HTTPResult   `json:"http"`
+	HTTPS      https_tester.HTTPSResult `json:"https"`
+	QUIC       quic_tester.QUICResult   `json:"quic"`
 }
 
 func TestDomain(country string, domain string, ip string) {
 	util.PrintInfo(domain, "initiating tests...")
+	util.ResetResidualDetector()
 
 	report := TestReport{
-		country:    country,
-		proxyIP:    config.ProxyIP,
-		hostDomain: domain,
-		hostIP:     ip,
-		dns:        dns_tester.TestDNS(ip, domain),
-		http:       http_tester.TestHTTP(ip, domain),
-		https:      https_tester.TestHTTPS(ip, domain),
-		quic:       quic_tester.TestQUIC(ip, domain),
+		Country:    country,
+		ProxyIP:    config.ProxyIP,
+		HostDomain: domain,
+		HostIP:     ip,
+		DNS:        dns_tester.TestDNS(ip, domain),
+		IP:         ip_tester.TestIP(ip),
+		HTTP:       http_tester.TestHTTP(ip, domain),
+		HTTPS:      https_tester.TestHTTPS(ip, domain),
+		QUIC:       quic_tester.TestQUIC(ip, domain),
+		Residual:   util.AllResidualDetected,
 	}
-
-	j, _ := json.Marshal(report)
-	fmt.Println(string(j))
 
 	err := saveToDB(report)
 	if err != nil {
@@ -49,16 +52,28 @@ func TestDomain(country string, domain string, ip string) {
 }
 
 func saveToDB(report TestReport) error {
-	util.PrintInfo(report.hostDomain, "saving results...")
+	util.PrintInfo(report.HostDomain, "saving results...")
+	j, _ := json.MarshalIndent(report, "", "    ")
+	fmt.Println(string(j))
+
 	client, err := connectDB()
 	if err != nil {
+		util.PrintError("", err)
 		return err
 	}
-	defer client.Disconnect(context.Background())
+
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+			util.PrintError("", err)
+		}
+	}(client, context.Background())
 
 	collection := client.Database("shawshank").Collection("results")
+
 	_, err = collection.InsertOne(context.Background(), report)
 	if err != nil {
+		util.PrintError("", err)
 		return err
 	}
 
@@ -69,7 +84,7 @@ func connectDB() (*mongo.Client, error) {
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
-		util.PrintError(config.ProxyIP, "", err)
+		util.PrintError("", err)
 		return nil, err
 	}
 	return client, nil

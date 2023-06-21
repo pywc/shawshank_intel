@@ -1,6 +1,9 @@
 package https_tester
 
-import "github.com/pywc/shawshank_intel/util"
+import (
+	"github.com/pywc/shawshank_intel/config"
+	"github.com/pywc/shawshank_intel/util"
+)
 
 type HTTPSResult struct {
 	Connectivity          int             `json:"connectivity"`
@@ -19,16 +22,20 @@ type HTTPSResult struct {
 }
 
 func TestHTTPS(ip string, domain string) HTTPSResult {
+	config.CurrentComponent = "https"
 	util.PrintInfo(domain, "testing HTTPS...")
+
 	result := HTTPSResult{}
 	result.Connectivity = CheckHTTPSConnectivity(domain, ip)
-	if result.Connectivity == 0 {
+	if result.Connectivity <= 0 {
 		return result
 	}
 
 	result.ESNI = CheckESNI()
 	result.Certificate = -5
 	result.BlindTLS, _ = CheckTLS12Resumption(domain, ip)
+
+	util.PrintInfo(domain, "initializing cenfuzz drivers...")
 	result.SNIPadding = CheckServerNamePadding(domain, ip)
 	result.MinVerAlternate = CheckMinVersionAlternate(domain, ip)
 	result.MaxVerAlternate = CheckMaxVersionAlternate(domain, ip)

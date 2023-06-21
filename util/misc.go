@@ -51,10 +51,10 @@ func Repeat(s string, n int) string {
 	return returnString
 }
 
-func PrintError(proxyIP string, domain string, err error) {
-	log.Println("Error: " + proxyIP + " - " + domain + " - " + err.Error())
+func PrintError(domain string, err error) {
+	PrintInfo(domain, "Error: "+err.Error())
 }
 
 func PrintInfo(domain string, info string) {
-	log.Println(config.ProxyIP + " - " + domain + " - " + info)
+	log.Println(config.ProxyISP + " (" + config.ProxyCountry + ") - " + domain + " - " + config.CurrentComponent + " - " + info)
 }

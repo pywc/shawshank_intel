@@ -8,7 +8,7 @@ import (
 type HTTPResult struct {
 	Connectivity         HTTPConnectivityResult `json:"connectivity"`
 	HeaderHost           []FilteredHTTP         `json:"header_host,omitempty"`
-	HtmlTitle            HTTPConnectivityResult `json:"html_title"`
+	HtmlTitle            []FilteredHTTP         `json:"html_title"`
 	HtmlTokens           []FilteredHTTP         `json:"html_tokens,omitempty"`
 	HostnamePadding      []FilteredHTTP         `json:"hostname_padding,omitempty"`
 	GetCapitalize        []FilteredHTTP         `json:"get_capitalize,omitempty"`
@@ -29,10 +29,13 @@ type HTTPResult struct {
 }
 
 func TestHTTP(ip string, domain string) HTTPResult {
+	config.CurrentComponent = "http"
 	util.PrintInfo(domain, "testing HTTP...")
+
 	result := HTTPResult{}
+
 	result.Connectivity = CheckHTTPConnectivity(domain, ip)
-	if result.Connectivity.resultCode == 0 || result.Connectivity.resultCode == -10 {
+	if result.Connectivity.ResultCode <= 0 {
 		return result
 	}
 
@@ -40,13 +43,12 @@ func TestHTTP(ip string, domain string) HTTPResult {
 	result.HtmlTitle = CheckHTMLTitle(domain)
 	result.HtmlTokens, _ = CheckHTMLTokens(domain)
 
-	util.PrintInfo(domain, "Initiating cenfuzz drivers...")
+	util.PrintInfo(domain, "initiating cenfuzz drivers...")
 
 	if config.ProxyType != "https" {
 		result.HostnamePadding = CheckHostnamePadding(domain, ip)
 		result.GetCapitalize = CheckGetWordCapitalize(domain, ip)
 		result.GetRemove = CheckGetWordRemove(domain, ip)
-		result.GetAlternate = CheckGetWordAlternate(domain, ip)
 		result.HttpCapitalize = CheckHTTPWordCapitalize(domain, ip)
 		result.HttpRemove = CheckHTTPWordRemove(domain, ip)
 		result.HttpAlternate = CheckHTTPWordAlternate(domain, ip)
@@ -55,10 +57,13 @@ func TestHTTP(ip string, domain string) HTTPResult {
 		result.HostAlternate = CheckHostWordAlternate(domain, ip)
 		result.HttpDelimiterRemove = CheckHTTPDelimiterWordRemove(domain, ip)
 	}
-	
+
+	result.GetAlternate = CheckGetWordAlternate(domain, ip)
 	result.HeaderAlternate = CheckHeaderAlternate(domain, ip)
 	result.PathAlternate = CheckPathAlternate(domain, ip)
-	result.HostnameAlternate = CheckHostnameAlternate(domain, ip)
+
+	// TODO: fix error
+	// result.HostnameAlternate = CheckHostnameAlternate(domain, ip)
 	result.HostnameTLDAlternate = CheckHostnameTLDAlternate(domain, ip)
 	result.SubdomainAlternate = CheckHostnameSubdomainAlternate(domain, ip)
 

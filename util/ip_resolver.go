@@ -3,7 +3,6 @@ package util
 import (
 	"context"
 	"errors"
-	"github.com/pywc/shawshank_intel/config"
 	"net"
 	"time"
 )
@@ -24,7 +23,7 @@ func ResolveIPLocally(domain string) (string, error) {
 
 	if err != nil || len(ipList) == 0 {
 		newErr := errors.New("cannot resolve IP from Cloudflare")
-		PrintError(config.ProxyIP, domain, newErr)
+		PrintError(domain, newErr)
 		return "", newErr
 	}
 
