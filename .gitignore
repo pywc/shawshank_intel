@@ -24,3 +24,4 @@ go.work
 .DS_Store
 test.go
 sess.pem
+proxies.csv
