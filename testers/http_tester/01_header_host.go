@@ -40,7 +40,7 @@ func CheckHTTPHeaderHost(domain string) (int, []FilteredHTTP) {
 		req += reqBody
 
 		resultCode, resp, redirectURL, err := SendHTTPRequest(config.EchoServerAddr,
-			config.EchoServerAddr, config.EchoServerPort, req)
+			config.EchoServerAddr, config.EchoServerPort, req, "")
 
 		if resultCode == 0 && !strings.Contains(resp, config.MagicWord) {
 			resultCode = 399

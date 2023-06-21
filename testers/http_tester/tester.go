@@ -39,6 +39,8 @@ func TestHTTP(ip string, domain string) HTTPResult {
 		return result
 	}
 
+	redirectHost := result.Connectivity.RedirectURL
+
 	_, result.HeaderHost = CheckHTTPHeaderHost(domain)
 	result.HtmlTitle = CheckHTMLTitle(domain)
 	result.HtmlTokens, _ = CheckHTMLTokens(domain)
@@ -46,26 +48,26 @@ func TestHTTP(ip string, domain string) HTTPResult {
 	util.PrintInfo(domain, "initiating cenfuzz drivers...")
 
 	if config.ProxyType != "https" {
-		result.HostnamePadding = CheckHostnamePadding(domain, ip)
-		result.GetCapitalize = CheckGetWordCapitalize(domain, ip)
-		result.GetRemove = CheckGetWordRemove(domain, ip)
-		result.HttpCapitalize = CheckHTTPWordCapitalize(domain, ip)
-		result.HttpRemove = CheckHTTPWordRemove(domain, ip)
-		result.HttpAlternate = CheckHTTPWordAlternate(domain, ip)
-		result.HostCapitalize = CheckHostWordCapitalize(domain, ip)
-		result.HostRemove = CheckHostWordRemove(domain, ip)
-		result.HostAlternate = CheckHostWordAlternate(domain, ip)
-		result.HttpDelimiterRemove = CheckHTTPDelimiterWordRemove(domain, ip)
+		result.HostnamePadding = CheckHostnamePadding(domain, ip, redirectHost)
+		result.GetCapitalize = CheckGetWordCapitalize(domain, ip, redirectHost)
+		result.GetRemove = CheckGetWordRemove(domain, ip, redirectHost)
+		result.HttpCapitalize = CheckHTTPWordCapitalize(domain, ip, redirectHost)
+		result.HttpRemove = CheckHTTPWordRemove(domain, ip, redirectHost)
+		result.HttpAlternate = CheckHTTPWordAlternate(domain, ip, redirectHost)
+		result.HostCapitalize = CheckHostWordCapitalize(domain, ip, redirectHost)
+		result.HostRemove = CheckHostWordRemove(domain, ip, redirectHost)
+		result.HostAlternate = CheckHostWordAlternate(domain, ip, redirectHost)
+		result.HttpDelimiterRemove = CheckHTTPDelimiterWordRemove(domain, ip, redirectHost)
 	}
 
-	result.GetAlternate = CheckGetWordAlternate(domain, ip)
-	result.HeaderAlternate = CheckHeaderAlternate(domain, ip)
-	result.PathAlternate = CheckPathAlternate(domain, ip)
+	result.GetAlternate = CheckGetWordAlternate(domain, ip, redirectHost)
+	result.HeaderAlternate = CheckHeaderAlternate(domain, ip, redirectHost)
+	result.PathAlternate = CheckPathAlternate(domain, ip, redirectHost)
 
 	// TODO: fix error
-	// result.HostnameAlternate = CheckHostnameAlternate(domain, ip)
-	result.HostnameTLDAlternate = CheckHostnameTLDAlternate(domain, ip)
-	result.SubdomainAlternate = CheckHostnameSubdomainAlternate(domain, ip)
+	// result.HostnameAlternate = CheckHostnameAlternate(domain, ip, redirectHost)
+	result.HostnameTLDAlternate = CheckHostnameTLDAlternate(domain, ip, redirectHost)
+	result.SubdomainAlternate = CheckHostnameSubdomainAlternate(domain, ip, redirectHost)
 
 	return result
 }

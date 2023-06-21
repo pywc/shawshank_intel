@@ -81,6 +81,27 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 	return 0, string(respBody), nil
 }
 
+func SendHTTPSRequestNormally(domain string, ip string, port int, req string, utlsConfig *utls.Config) (int, error) {
+	// Fetch via proxy
+	conn, err := util.ConnectNormally(ip, port)
+
+	if err != nil {
+		util.PrintError(domain, err)
+		return -2, err
+	}
+
+	resp, err := util.SendHTTPSTraffic(conn, req, utlsConfig, nil, utls.HelloGolang)
+	if err != nil {
+		util.PrintError(domain, err)
+		return -3, err
+	}
+
+	resp.Body.Close()
+	conn.Close()
+
+	return 0, nil
+}
+
 // SendHTTPSRequestCustom Returns result_code, response_body
 /*
 	Result Code Entry

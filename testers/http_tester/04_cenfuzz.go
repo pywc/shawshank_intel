@@ -6,8 +6,8 @@ import (
 	"strconv"
 )
 
-func FuzzSender(hostname string, ip string, req string, component string) *FilteredHTTP {
-	resultCode, _, redirectURL, err := SendHTTPRequest(hostname, ip, 80, req)
+func FuzzSender(hostname string, ip string, req string, component string, redirectHost string) *FilteredHTTP {
+	resultCode, _, redirectURL, err := SendHTTPRequest(hostname, ip, 80, req, redirectHost)
 	util.PrintInfo(hostname, component+" result: "+strconv.Itoa(resultCode))
 	if resultCode == 0 {
 		return nil
@@ -24,7 +24,7 @@ func FuzzSender(hostname string, ip string, req string, component string) *Filte
 	return &filtered
 }
 
-func CheckHostnamePadding(hostname string, ip string) []FilteredHTTP {
+func CheckHostnamePadding(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	hostnameAllPadding := GenerateAllHostNamePaddings(hostname)
 	filteredList := make([]FilteredHTTP, len(hostnameAllPadding))
 
@@ -34,7 +34,7 @@ func CheckHostnamePadding(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -45,7 +45,7 @@ func CheckHostnamePadding(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckGetWordCapitalize(hostname string, ip string) []FilteredHTTP {
+func CheckGetWordCapitalize(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	getWords := GenerateAllCapitalizedPermutations("GET")
 	filteredList := make([]FilteredHTTP, len(getWords))
 
@@ -56,7 +56,7 @@ func CheckGetWordCapitalize(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -67,7 +67,7 @@ func CheckGetWordCapitalize(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckGetWordRemove(hostname string, ip string) []FilteredHTTP {
+func CheckGetWordRemove(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	getWordAllRemove := GenerateAllSubstringPermutations("GET")
 	filteredList := make([]FilteredHTTP, len(getWordAllRemove))
 
@@ -78,7 +78,7 @@ func CheckGetWordRemove(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -89,7 +89,7 @@ func CheckGetWordRemove(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckGetWordAlternate(hostname string, ip string) []FilteredHTTP {
+func CheckGetWordAlternate(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	getWordAllAlternate := GenerateAllGetAlternatives()
 	filteredList := make([]FilteredHTTP, len(getWordAllAlternate))
 
@@ -100,7 +100,7 @@ func CheckGetWordAlternate(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -111,7 +111,7 @@ func CheckGetWordAlternate(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHTTPWordCapitalize(hostname string, ip string) []FilteredHTTP {
+func CheckHTTPWordCapitalize(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	httpWords := GenerateAllCapitalizedPermutations("HTTP/1.1")
 	filteredList := make([]FilteredHTTP, len(httpWords))
 
@@ -122,7 +122,7 @@ func CheckHTTPWordCapitalize(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -133,7 +133,7 @@ func CheckHTTPWordCapitalize(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHTTPWordRemove(hostname string, ip string) []FilteredHTTP {
+func CheckHTTPWordRemove(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	httpWordAllRemove := GenerateAllSubstringPermutations("HTTP/1.1")
 	filteredList := make([]FilteredHTTP, len(httpWordAllRemove))
 
@@ -144,7 +144,7 @@ func CheckHTTPWordRemove(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -155,7 +155,7 @@ func CheckHTTPWordRemove(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHTTPWordAlternate(hostname string, ip string) []FilteredHTTP {
+func CheckHTTPWordAlternate(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	httpWordAllAlternate := GenerateAllHttpAlternatives()
 	filteredList := make([]FilteredHTTP, len(httpWordAllAlternate))
 
@@ -166,7 +166,7 @@ func CheckHTTPWordAlternate(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -177,7 +177,7 @@ func CheckHTTPWordAlternate(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHostWordCapitalize(hostname string, ip string) []FilteredHTTP {
+func CheckHostWordCapitalize(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	hostWords := GenerateAllCapitalizedPermutations("Host:")
 	filteredList := make([]FilteredHTTP, len(hostWords))
 
@@ -188,7 +188,7 @@ func CheckHostWordCapitalize(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -199,7 +199,7 @@ func CheckHostWordCapitalize(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHostWordRemove(hostname string, ip string) []FilteredHTTP {
+func CheckHostWordRemove(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	hostWordAllRemove := GenerateAllSubstringPermutations("Host:")
 	filteredList := make([]FilteredHTTP, len(hostWordAllRemove))
 
@@ -210,7 +210,7 @@ func CheckHostWordRemove(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -221,7 +221,7 @@ func CheckHostWordRemove(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHostWordAlternate(hostname string, ip string) []FilteredHTTP {
+func CheckHostWordAlternate(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	hostWordAllAlternate := GenerateAllHostAlternatives()
 	filteredList := make([]FilteredHTTP, len(hostWordAllAlternate))
 
@@ -232,7 +232,7 @@ func CheckHostWordAlternate(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -243,7 +243,7 @@ func CheckHostWordAlternate(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHTTPDelimiterWordRemove(hostname string, ip string) []FilteredHTTP {
+func CheckHTTPDelimiterWordRemove(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	httpDelimiterWordAllRemove := GenerateAllSubstringPermutations("\r\n")
 	filteredList := make([]FilteredHTTP, len(httpDelimiterWordAllRemove))
 
@@ -254,7 +254,7 @@ func CheckHTTPDelimiterWordRemove(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -265,7 +265,7 @@ func CheckHTTPDelimiterWordRemove(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckPathAlternate(hostname string, ip string) []FilteredHTTP {
+func CheckPathAlternate(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	pathAllAlternate := GenerateAllPathAlternatives(hostname)
 	filteredList := make([]FilteredHTTP, len(pathAllAlternate))
 
@@ -276,7 +276,7 @@ func CheckPathAlternate(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -287,7 +287,7 @@ func CheckPathAlternate(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHeaderAlternate(hostname string, ip string) []FilteredHTTP {
+func CheckHeaderAlternate(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	headerAllAlternate := GenerateAllHeaderAlternatives()
 	filteredList := make([]FilteredHTTP, len(headerAllAlternate))
 
@@ -298,7 +298,7 @@ func CheckHeaderAlternate(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -309,7 +309,7 @@ func CheckHeaderAlternate(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHostnameAlternate(hostname string, ip string) []FilteredHTTP {
+func CheckHostnameAlternate(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	hostnameAllAlternate := GenerateAllHostNameAlternatives(hostname)
 	filteredList := make([]FilteredHTTP, len(hostnameAllAlternate))
 
@@ -319,7 +319,7 @@ func CheckHostnameAlternate(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -330,7 +330,7 @@ func CheckHostnameAlternate(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHostnameTLDAlternate(hostname string, ip string) []FilteredHTTP {
+func CheckHostnameTLDAlternate(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	hostnameTLDAllAlternate := GenerateAllTLDAlternatives(hostname)
 	filteredList := make([]FilteredHTTP, len(hostnameTLDAllAlternate))
 
@@ -340,7 +340,7 @@ func CheckHostnameTLDAlternate(hostname string, ip string) []FilteredHTTP {
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
@@ -351,7 +351,7 @@ func CheckHostnameTLDAlternate(hostname string, ip string) []FilteredHTTP {
 	return filteredList
 }
 
-func CheckHostnameSubdomainAlternate(hostname string, ip string) []FilteredHTTP {
+func CheckHostnameSubdomainAlternate(hostname string, ip string, redirectHost string) []FilteredHTTP {
 	subdomainAllAlternate := GenerateAllSubdomainsAlternatives(hostname)
 	filteredList := make([]FilteredHTTP, len(subdomainAllAlternate))
 
@@ -361,7 +361,7 @@ func CheckHostnameSubdomainAlternate(hostname string, ip string) []FilteredHTTP 
 		}
 
 		req := FormatHttpRequest(reqWord)
-		filtered := FuzzSender(hostname, ip, req, testComponent)
+		filtered := FuzzSender(hostname, ip, req, testComponent, redirectHost)
 		if filtered == nil {
 			continue
 		}
