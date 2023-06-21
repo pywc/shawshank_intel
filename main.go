@@ -3,9 +3,11 @@
 package main
 
 import (
+	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/db"
 	"github.com/pywc/shawshank_intel/util"
 	"log"
+	"math/rand"
 	"os"
 	"strconv"
 )
@@ -32,15 +34,28 @@ func main() {
 		proxyPort, _ := strconv.Atoi(proxy[3])
 		proxyUsername := proxy[4]
 		proxyPassword := proxy[5]
+		log.Println("testing country " + countryCode + "...")
 
 		// set proxy
 		util.SetProxy(proxyIP, proxyPort, proxyUsername, proxyPassword, proxyType)
+		err := util.FetchISP()
+		if err != nil {
+			continue
+		}
 
 		// get domains
 		testList, err := util.GetTestDomains(countryCode)
 		if err != nil {
 			continue
 		}
+
+		// Fisher–Yates shuffle
+		log.Println("testing only " + strconv.Itoa(config.TestCount) + " domains")
+		for i := len(testList) - 1; i > 0; i-- {
+			j := rand.Intn(i + 1)
+			testList[i], testList[j] = testList[j], testList[i]
+		}
+		testList = testList[:30]
 
 		// test for each domain
 		for _, domain := range testList {

@@ -6,6 +6,7 @@ require golang.org/x/net v0.10.0
 
 require (
 	github.com/Focinfi/go-dns-resolver v1.0.1 // indirect
+	github.com/adrg/strutil v0.3.0 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/bbalet/stopwords v1.0.0 // indirect
 	github.com/gaukas/godicttls v0.0.3 // indirect

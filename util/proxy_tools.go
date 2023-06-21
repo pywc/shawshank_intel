@@ -14,7 +14,7 @@ func SetProxy(ip string, port int, username string, password string, proxyType s
 	config.ProxyPassword = password
 	config.ProxyType = proxyType
 
-	log.Println("Current proxy is set to " + ip + " of type " + proxyType)
+	log.Println("Current proxy is set to " + ParseProxy() + " of type " + proxyType)
 }
 
 func ParseSOCKS5ProxyFull(remoteDNS bool) string {
@@ -48,6 +48,14 @@ func ParseProxy() string {
 	return result
 }
 
+func ParseEcho() string {
+	result := config.EchoServerAddr
+	result += ":"
+	result += strconv.Itoa(config.EchoServerPort)
+
+	return result
+}
+
 func ParseAuth() string {
 	auth := base64.StdEncoding.EncodeToString([]byte(config.ProxyUsername + ":" + config.ProxyPassword))
 	return auth
@@ -57,7 +65,7 @@ func FetchProxy(path string) ([][]string, error) {
 	log.Println("Fetching proxies...")
 	data, err := ReadCsvFile(path)
 	if err != nil {
-		PrintError(path, "", err)
+		PrintError("", err)
 		return nil, err
 	}
 

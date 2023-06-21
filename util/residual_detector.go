@@ -13,6 +13,10 @@ type ResidualDetected struct {
 	duration   float64
 }
 
+func ResetResidualDetector() {
+	AllResidualDetected = make([]ResidualDetected, 0)
+}
+
 func DetectResidual(ip string, port int, component string) (int, float64) {
 	/*
 		-1: init

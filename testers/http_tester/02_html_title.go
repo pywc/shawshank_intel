@@ -32,24 +32,18 @@ func findTitle(node *html.Node) string {
 
 // CheckHTMLTitle Checks whether HTML <title> tag is used for filtering
 // Sets 399 as result code if it does not contain the correct magic word
-func CheckHTMLTitle(domain string) HTTPConnectivityResult {
+func CheckHTMLTitle(domain string) []FilteredHTTP {
 	// Fetch the HTML content from the domain
 	respClean, err := http.Get("http://" + domain)
 	if err != nil {
-		return HTTPConnectivityResult{
-			resultCode:  -3,
-			redirectURL: "",
-		}
+		return nil
 	}
 
 	// Parse the HTML document
 	doc, err := html.Parse(respClean.Body)
 	respClean.Body.Close()
 	if err != nil {
-		return HTTPConnectivityResult{
-			resultCode:  -10,
-			redirectURL: "",
-		}
+		return nil
 	}
 
 	// Find the title element
@@ -59,11 +53,11 @@ func CheckHTMLTitle(domain string) HTTPConnectivityResult {
 	html := "<html><head><title>" + title + "</title></head><body>" + config.MagicWord + "</body></html>"
 	reqBody := "magicWord=" + url.QueryEscape(html)
 	req := "POST http://" + config.EchoServerAddr + " HTTP/1.1\r\n" +
-		"Host: " + config.EchoServerAddr + "\r\n" +
+		"Host: " + util.ParseProxy() + "\r\n" +
 		"Content-Type: application/x-www-form-urlencoded\r\n" +
 		"Content-Length: " + strconv.Itoa(len(reqBody)) + "\r\n"
 	if config.ProxyUsername != "" {
-		req += "Proxy-Authorization: " + util.ParseAuth() + "\r\n"
+		req += "Proxy-Authorization: Basic " + util.ParseAuth() + "\r\n"
 	}
 	req += "\r\n"
 	req += reqBody
@@ -77,10 +71,13 @@ func CheckHTMLTitle(domain string) HTTPConnectivityResult {
 		redirectURL = "unknown"
 	}
 
-	util.PrintInfo(domain, "html title result for "+title+": "+strconv.Itoa(resultCode))
+	util.PrintInfo(domain, "html title result for \""+title+"\" is "+strconv.Itoa(resultCode))
 
-	return HTTPConnectivityResult{
-		resultCode:  resultCode,
-		redirectURL: redirectURL,
+	return []FilteredHTTP{
+		{
+			Component:   title,
+			ResultCode:  resultCode,
+			RedirectURL: redirectURL,
+		},
 	}
 }

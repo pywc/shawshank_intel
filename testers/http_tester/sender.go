@@ -1,17 +1,20 @@
 package http_tester
 
 import (
+	"github.com/adrg/strutil"
+	"github.com/adrg/strutil/metrics"
+	"github.com/jpillora/go-tld"
 	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/util"
 	"io"
-	url2 "net/url"
+	"strconv"
 	"strings"
 )
 
 type FilteredHTTP struct {
-	component   string
-	resultCode  int
-	redirectURL string
+	Component   string `json:"component,omitempty"`
+	ResultCode  int    `json:"result_code,omitempty"`
+	RedirectURL string `json:"redirect_url,omitempty"`
 }
 
 // SendHTTPRequest Returns result_code, response_body, redirect_url (if redirection)
@@ -42,12 +45,19 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 		}
 
 		// IP is not accessible from the US
+		util.PrintError(domain, err)
 		return -2, "", "", err
 	}
 
-	resp, err := util.SendHTTPTraffic(conn, req)
+	reqNormal := "GET / HTTP/1.1\r\n" +
+		"Host: " + domain + "\r\n" +
+		"Accept: */*\r\n" +
+		"User-Agent: " + config.UserAgent + "\r\n\r\n"
+
+	resp, err := util.SendHTTPTraffic(conn, reqNormal)
 	conn.Close()
 	if err != nil {
+		util.PrintError(domain, err)
 		return -3, "", "", err
 	}
 
@@ -62,6 +72,7 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 			util.DetectResidual(ip, port, "http")
 		} else {
 			// unknown error
+			util.PrintError(domain, err)
 			return -10, "", "", err
 		}
 	}
@@ -91,31 +102,37 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 	resp.Body.Close()
 	conn.Close()
 
-	if resultCode >= 400 {
+	if resultCode == 521 {
+		// cloudflare server down
+		return -3, string(respBody), "", nil
+	} else if resultCode >= 400 {
 		// check 4xx - 5xx
 		return resultCode, string(respBody), "", nil
 	} else if resultCode >= 300 {
 		// check redirection
-		redirectURL := respHeader["Location"][0]
-		if redirectURL != "" {
-			urlCompare, _ := url2.Parse(redirectURL)
-			urlOriginElements := strings.Split(domain, ".")
-			urlCompareElements := strings.Split(urlCompare.Host, ".")
-
-			intersection := make(map[string]bool)
-			for _, element := range urlOriginElements {
-				intersection[element] = true
+		redirectURL := respHeader["Location"]
+		if len(redirectURL) < 1 {
+			return resultCode, string(respBody), "unknown", nil
+		} else if redirectURL[0] != "" {
+			urlCompare, err := tld.Parse(redirectURL[0])
+			if err != nil {
+				util.PrintError(domain, err)
+				return resultCode, string(respBody), "unknown", nil
 			}
 
-			var result []string
-			for _, element := range urlCompareElements {
-				if intersection[element] {
-					result = append(result, element)
-				}
+			urlOriginal, err := tld.Parse("http://" + domain)
+			if err != nil {
+				util.PrintError(domain, err)
+				return resultCode, string(respBody), "unknown", nil
 			}
 
-			if len(result) < 2 {
-				return resultCode, string(respBody), redirectURL, nil
+			similarity := strutil.Similarity(urlOriginal.Domain, urlCompare.Domain, metrics.NewHamming())
+			util.PrintInfo(domain, "redirection: similarity between \""+
+				urlOriginal.Domain+"\" and \""+urlCompare.Domain+"\" is "+
+				strconv.FormatFloat(similarity, 'f', -1, 64))
+
+			if similarity < config.DomainSimilarityThreshold {
+				return resultCode, string(respBody), redirectURL[0], nil
 			}
 		}
 	}

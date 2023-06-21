@@ -5,11 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="Resolved circular dependency">
-      <change afterPath="$PROJECT_DIR$/proxies.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/testers/ip_tester/tester.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxies.csv" beforeDir="false" afterPath="$PROJECT_DIR$/proxies.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/02_html_title.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/02_html_title.go" afterDir="false" />
@@ -18,11 +21,10 @@
       <change beforePath="$PROJECT_DIR$/testers/http_tester/generators.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/generators.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/sender.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/tester.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/04_blindtls.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/04_blindtls.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/https_tester/06_cenfuzz.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/06_cenfuzz.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/https_tester/generators.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/generators.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/https_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/sender.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/tester.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/ip_tester/00_port.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/ip_tester/00_port.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/connection.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/connection.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/geolocator.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/geolocator.go" afterDir="false" />
@@ -54,7 +56,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectId" id="2QGn12kjVZ6FVmIT9U6kz8Fe1Qp" />
   <component name="ProjectLevelVcsManager">
@@ -76,7 +78,7 @@
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
-    "last_opened_file_path": "/Users/pywchung/go/Shawshank",
+    "last_opened_file_path": "/Users/pywchung/go/Shawshank/testers/ip_tester",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "run.code.analysis.last.selected.profile": "pProject Default",
@@ -90,6 +92,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/testers/ip_tester" />
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">

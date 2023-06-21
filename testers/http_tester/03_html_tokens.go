@@ -32,7 +32,8 @@ func CheckHTMLTokens(domain string) ([]FilteredHTTP, error) {
 	tempList := strings.Split(tempStr, " ")
 	testList := make([]string, 0)
 	for _, token := range tempList {
-		if len(token) < 3 || slices.Contains(testList, token) {
+		token = config.NonAlphanumericRegex.ReplaceAllString(token, "")
+		if len(token) < 4 || slices.Contains(testList, token) {
 			continue
 		}
 
@@ -42,14 +43,13 @@ func CheckHTMLTokens(domain string) ([]FilteredHTTP, error) {
 	// send each token to echo server
 	filteredList := make([]FilteredHTTP, 0)
 	for _, token := range testList {
-
 		reqBody := "magicWord=" + url.QueryEscape(token)
-		req := "POST http://" + config.EchoServerAddr + " HTTP/1.1\r\n" +
-			"Host: " + config.EchoServerAddr + "\r\n" +
+		req := "POST http://" + util.ParseEcho() + " HTTP/1.1\r\n" +
+			"Host: " + util.ParseEcho() + "\r\n" +
 			"Content-Type: application/x-www-form-urlencoded\r\n" +
 			"Content-Length: " + strconv.Itoa(len(reqBody)) + "\r\n"
 		if config.ProxyUsername != "" {
-			req += "Proxy-Authorization: " + util.ParseAuth() + "\r\n"
+			req += "Proxy-Authorization: Basic " + util.ParseAuth() + "\r\n"
 		}
 		req += "\r\n"
 		req += reqBody
@@ -58,17 +58,18 @@ func CheckHTMLTokens(domain string) ([]FilteredHTTP, error) {
 			log.Println("[*] Error - " + domain + " - " + err.Error())
 		}
 
-		if resultCode == 0 && !strings.Contains(resp, token) {
+		if resultCode == 0 && !strings.Contains(resp, url.QueryEscape(token)) {
 			resultCode = 399
 			redirectURL = "unknown"
 		} else if resultCode == 0 {
+			util.PrintInfo(domain, "html token result for \""+token+"\": "+strconv.Itoa(resultCode))
 			continue
 		}
 
 		filtered := FilteredHTTP{
-			component:   token,
-			resultCode:  resultCode,
-			redirectURL: redirectURL,
+			Component:   token,
+			ResultCode:  resultCode,
+			RedirectURL: redirectURL,
 		}
 
 		util.PrintInfo(domain, "html token result for \""+token+"\": "+strconv.Itoa(resultCode))

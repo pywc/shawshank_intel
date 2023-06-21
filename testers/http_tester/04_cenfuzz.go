@@ -16,9 +16,9 @@ func FuzzSender(hostname string, ip string, req string, component string) *Filte
 	}
 
 	filtered := FilteredHTTP{
-		component:   component,
-		resultCode:  resultCode,
-		redirectURL: redirectURL,
+		Component:   component,
+		ResultCode:  resultCode,
+		RedirectURL: redirectURL,
 	}
 
 	return &filtered
@@ -352,7 +352,7 @@ func CheckHostnameTLDAlternate(hostname string, ip string) []FilteredHTTP {
 }
 
 func CheckHostnameSubdomainAlternate(hostname string, ip string) []FilteredHTTP {
-	subdomainAllAlternate := GenerateAllHostNameAlternatives(hostname)
+	subdomainAllAlternate := GenerateAllSubdomainsAlternatives(hostname)
 	filteredList := make([]FilteredHTTP, len(subdomainAllAlternate))
 
 	for _, testComponent := range subdomainAllAlternate {

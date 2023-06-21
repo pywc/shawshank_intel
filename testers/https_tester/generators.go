@@ -129,33 +129,6 @@ func CreateTLSConfig(requestWord RequestWord) *utls.Config {
 				MaxVersion:         requestWord.MaxVersion,
 				Certificates:       []utls.Certificate{cert},
 			}
-		} else if serverNameParts[1] == "tld" {
-			domainParts, _ := tld.Parse("https://" + serverNameParts[0])
-			var serverName string
-			if domainParts.Subdomain != "" {
-				serverName = domainParts.Subdomain + "." + domainParts.Domain + "." + serverNameParts[2]
-			} else {
-				serverName = domainParts.Domain + "." + serverNameParts[2]
-			}
-			return &utls.Config{
-				ServerName:         serverName,
-				InsecureSkipVerify: true,
-				CipherSuites:       requestWord.CipherSuites,
-				MinVersion:         requestWord.MinVersion,
-				MaxVersion:         requestWord.MaxVersion,
-				Certificates:       []utls.Certificate{cert},
-			}
-		} else if serverNameParts[1] == "subdomain" {
-			domainParts, _ := tld.Parse("https://" + serverNameParts[0])
-			serverName := serverNameParts[2] + "." + domainParts.Domain + "." + domainParts.TLD
-			return &utls.Config{
-				ServerName:         serverName,
-				InsecureSkipVerify: true,
-				CipherSuites:       requestWord.CipherSuites,
-				MinVersion:         requestWord.MinVersion,
-				MaxVersion:         requestWord.MaxVersion,
-				Certificates:       []utls.Certificate{cert},
-			}
 		}
 	}
 
@@ -343,10 +316,10 @@ func GenerateAllCertificateAlternatives() []string {
 }
 
 // https://azbigmedia.com/business/here-are-2021s-most-popular-tlds-and-domain-registration-trends/
-var TLDs = []string{"%s|tld|com", "%s|tld|xyz", "%s|tld|net", "%s|tld|club", "%s|tld|me", "%s|tld|org", "%s|tld|co", "%s|tld|shop", "%s|tld|info", "%s|tld|live"}
+var TLDs = []string{"com", "xyz", "net", "club", "me", "org", "co", "shop", "info", "live"}
 
 // https://securitytrails.com/blog/most-popular-subdomains-mx-records#:~:text=As%20you%20can%20see%2C%20the,forums%2C%20wiki%2C%20community).
-var Subdomains = []string{"%s|subdomain|www", "%s|subdomain|mail", "%s|subdomain|forum", "%s|subdomain|m", "%s|subdomain|blog", "%s|subdomain|shop", "%s|subdomain|forums", "%s|subdomain|wiki", "%s|subdomain|community", "%s|subdomain|ww1"}
+var Subdomains = []string{"www", "mail", "forum", "m", "blog", "shop", "forums", "wiki", "community", "ww1"}
 
 var hostnames = []string{"%s|omit", "%s|empty", "%s|repeat|2", "%s|repeat|3", "%s|reverse"}
 
@@ -355,11 +328,17 @@ func GenerateTLDAlternatives() string {
 }
 
 func GenerateAllTLDAlternatives(hostname string) []string {
-	u, _ := tld.Parse("https://" + hostname)
 	tldAlternatives := GenerateAllAlternatives(TLDs)
 
 	for i, alt := range tldAlternatives {
-		tldAlternatives[i] = fmt.Sprintf(alt, u.Domain)
+		u, _ := tld.Parse("https://" + hostname)
+		newUrl := ""
+		if u.Subdomain != "" {
+			newUrl += u.Subdomain + "."
+		}
+
+		newUrl += u.Domain + "." + alt
+		tldAlternatives[i] = newUrl
 	}
 
 	return tldAlternatives
@@ -373,7 +352,13 @@ func GenerateAllSubdomainsAlternatives(hostname string) []string {
 	subdomainAlternatives := GenerateAllAlternatives(Subdomains)
 
 	for i, alt := range subdomainAlternatives {
-		subdomainAlternatives[i] = fmt.Sprintf(alt, hostname)
+		u, _ := tld.Parse("https://" + hostname)
+		newUrl := alt + "." + u.Domain
+		if u.TLD != "" {
+			newUrl += "." + u.TLD
+		}
+
+		subdomainAlternatives[i] = newUrl
 	}
 
 	return subdomainAlternatives

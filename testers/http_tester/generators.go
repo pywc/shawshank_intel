@@ -6,6 +6,7 @@ import (
 	combinations "github.com/mxschmitt/golang-combinations"
 	"github.com/pywc/shawshank_intel/config"
 	"github.com/pywc/shawshank_intel/util"
+	"golang.org/x/exp/slices"
 	"log"
 	"math/rand"
 	"strconv"
@@ -28,25 +29,39 @@ func FormatHttpRequest(requestWord RequestWord) string {
 	if requestWord.GetWord != "" {
 		getWord = requestWord.GetWord
 	}
+
 	httpWord := "HTTP/1.1"
 	if requestWord.HttpWord != "" {
 		httpWord = requestWord.HttpWord
 	}
-	hostWord := "Host:"
+
+	hostWord := "Host: "
 	if requestWord.HostWord != "" {
 		hostWord = requestWord.HostWord
 	}
+
 	httpDelimiterWord := "\r\n"
 	if requestWord.HttpDelimiterWord != "" {
 		httpDelimiterWord = requestWord.HttpDelimiterWord
 	}
-	path := " / "
-	if requestWord.Path != "" {
-		path = requestWord.Path
+
+	path := ""
+	if config.ProxyType == "https" {
+		path = " http://" + requestWord.Hostname + "/ "
+		if requestWord.Path != "" {
+			path = " http://" + requestWord.Hostname + "/"
+			path += strings.TrimSpace(requestWord.Path)
+		}
+	} else {
+		path = " / "
+		if requestWord.Path != "" {
+			path = requestWord.Path
+		}
 	}
+
 	header := ""
 	if requestWord.Header != "" {
-		header = requestWord.Header
+		header = requestWord.Header + "\r\n"
 	}
 
 	//Handle hostname changes - This has to be done at runtime, since the strategies would be selected first, but the hostname itself is only known at runtime
@@ -72,30 +87,19 @@ func FormatHttpRequest(requestWord RequestWord) string {
 			}
 		} else if hostNameParts[1] == "reverse" {
 			host = util.Reverse(hostNameParts[0])
-		} else if hostNameParts[1] == "tld" {
-			domainParts, err := tld.Parse("https://" + hostNameParts[0])
-			if err != nil {
-				util.PrintError(config.ProxyIP, "", err)
-			}
-			if domainParts.Subdomain != "" {
-				host = domainParts.Subdomain + "." + domainParts.Domain + "." + hostNameParts[2]
-			} else {
-				host = domainParts.Domain + "." + hostNameParts[2]
-			}
-		} else if hostNameParts[1] == "subdomain" {
-			domainParts, _ := tld.Parse("https://" + hostNameParts[0])
-			host = hostNameParts[2] + "." + domainParts.Domain + "." + domainParts.TLD
 		}
 	} else {
 		host = requestWord.Hostname
 	}
 
 	format := "%s%s%s%s%s%s\r\n%s"
-	if config.ProxyUsername != "" {
-		format += "Proxy-Authorization: " + util.ParseAuth() + "\r\n"
+	if config.ProxyType == "https" && config.ProxyUsername != "" {
+		format += "Proxy-Authorization: Basic " + util.ParseAuth() + "\r\n"
 	}
 	format += "\r\n"
-	return fmt.Sprintf(format, getWord, path, httpWord, httpDelimiterWord, hostWord, host, header)
+
+	result := fmt.Sprintf(format, getWord, path, httpWord, httpDelimiterWord, hostWord, host, header)
+	return result
 }
 
 func GenerateRandomCapitalizedValues(word string) string {
@@ -207,7 +211,24 @@ func GenerateGetAlternatives() string {
 }
 
 func GenerateAllGetAlternatives() []string {
-	return GenerateAllAlternatives(GetAlternatives)
+	allList := GenerateAllAlternatives(GetAlternatives)
+
+	if config.ProxyType == "https" {
+		noHTTPSProxy := []string{" ", "XXX"}
+		newList := make([]string, 0)
+
+		for _, entry := range allList {
+			if slices.Contains(noHTTPSProxy, entry) {
+				continue
+			}
+
+			newList = append(newList, entry)
+		}
+
+		return newList
+	}
+
+	return allList
 }
 
 var HttpAlternatives = []string{"XXXX/1.1", "HTTP/11.1", "HTTP/1.12", "/11.1", "HTTP2", "HTTP3", "HTTP9", "HTTP/2", "HTTP/3", "HTTP/9", " ", "HTTPx/1.1", "HTTP /1.1", "HTTP/ 1.1", "HTTP/1.1x", "HTTP/x1.1"}
@@ -230,19 +251,14 @@ func GenerateAllHostAlternatives() []string {
 	return GenerateAllAlternatives(HostAlternatives)
 }
 
-var PathAlternatives = []string{" http://%s/ ", " http://%s/z ", " http://%s/? ", " http://%s ", " http://%s/", " http://%s**", " http://%s/x", " http://%s/x/ "}
+var PathAlternatives = []string{"/ ", " z ", " ? ", " ", " /", "**", " /x", "x/ "}
 
 func GeneratePathAlternatives() string {
 	return GenerateAlternatives(PathAlternatives)
 }
 
 func GenerateAllPathAlternatives(hostname string) []string {
-	allAlternatives := GenerateAllAlternatives(PathAlternatives)
-	for i, alt := range allAlternatives {
-		allAlternatives[i] = fmt.Sprintf(alt, hostname)
-	}
-
-	return allAlternatives
+	return GenerateAllAlternatives(PathAlternatives)
 }
 
 var HTTPHeaders = []string{"Accept: text/html", "Accept: application/xml", "Accept: text/html,application/xhtml+xml", "Accept: application/json", "Accept: xxx", "Accept-Charset: utf-8", "Accept-Charset: xxx", "Accept-Datetime: Thu, 31 May 2007 20:35:00 GMT", "Accept-Datetime: xxx", "Accept-Encoding: gzip, deflate", "Accept-Encoding: xxx", "Accept-Language: en-US", "Accept-Language: xxx", "Access-Control-Request-Method: GET", "Access-Control-Request-Method: xxx", "Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==", "Cache-Control: no-cache", "Cache-Control: xxx", "Connection: keep-alive", "Connection: xxx", "Content-Encoding: gzip", "Content-Encoding: xxx", "Content-Length: 1000", "Content-MD5: Q2hlY2sgSW50ZWdyaXR5IQ==", "Content-Type: application/x-www-form-urlencoded", "Content-Type: xxx", "Cookie: $Version=1; Skin=new;", "Cookie: xxx", "Date: Tue, 15 Nov 1994 08:12:31 GMT", "Expect: 100-continue", "Expect: xxx", "From: user@example.com", "If-Match: \"737060cd8c284d8af7ad3082f209582d\"", "If-Modified-Since: Sat, 29 Oct 1994 19:43:31 GMT", "If-None-Match: \"737060cd8c284d8af7ad3082f209582d]\"", "If-Range: \"737060cd8c284d8af7ad3082f209582d\"", "If-Unmodified-Since: Sat, 29 Oct 1994 19:43:31 GMT", "Max-Forwards: 10", "Max-Forwards: xxx", "Origin: http://www.example-xxx.com", "Pragma: no-cache", "Pragma: xxx", "Prefer: return=representation", "Prefer: xxx", "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==", "Range: bytes=500-999", "Referer: http://example-xxx.com", "TE: trailers, deflate", "Trailer: Max-Forwards", "Trailer: xxx", "Transfer-Encoding: chunked", "Transfer-Encoding: xxx", "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0", "User-Agent: xxx", "Upgrade: h2c, HTTPS/1.3, IRC/6.9, RTA/x11, websocket", "Upgrade: xxx", "Via: 1.0 fred, 1.1 example-xxx.com (Apache/1.1)", "Warning: 199 Miscellaneous warning", "Warning: xxx"}
@@ -256,10 +272,10 @@ func GenerateAllHeaderAlternatives() []string {
 }
 
 // https://azbigmedia.com/business/here-are-2021s-most-popular-tlds-and-domain-registration-trends/
-var TLDs = []string{"%s|tld|com", "%s|tld|xyz", "%s|tld|net", "%s|tld|club", "%s|tld|me", "%s|tld|org", "%s|tld|co", "%s|tld|shop", "%s|tld|info", "%s|tld|live"}
+var TLDs = []string{"com", "xyz", "net", "club", "me", "org", "co", "shop", "info", "live"}
 
 // https://securitytrails.com/blog/most-popular-subdomains-mx-records#:~:text=As%20you%20can%20see%2C%20the,forums%2C%20wiki%2C%20community).
-var Subdomains = []string{"%s|subdomain|www", "%s|subdomain|mail", "%s|subdomain|forum", "%s|subdomain|m", "%s|subdomain|blog", "%s|subdomain|shop", "%s|subdomain|forums", "%s|subdomain|wiki", "%s|subdomain|community", "%s|subdomain|ww1"}
+var Subdomains = []string{"www", "mail", "forum", "m", "blog", "shop", "forums", "wiki", "community", "ww1"}
 
 var hostnames = []string{"%s|omit", "%s|empty", "%s|repeat|2", "%s|repeat|3", "%s|reverse"}
 
@@ -271,7 +287,14 @@ func GenerateAllTLDAlternatives(hostname string) []string {
 	tldAlternatives := GenerateAllAlternatives(TLDs)
 
 	for i, alt := range tldAlternatives {
-		tldAlternatives[i] = fmt.Sprintf(alt, hostname)
+		u, _ := tld.Parse("https://" + hostname)
+		newUrl := ""
+		if u.Subdomain != "" {
+			newUrl += u.Subdomain + "."
+		}
+
+		newUrl += u.Domain + "." + alt
+		tldAlternatives[i] = newUrl
 	}
 
 	return tldAlternatives
@@ -282,11 +305,16 @@ func GenerateSubdomainsAlternatives() string {
 }
 
 func GenerateAllSubdomainsAlternatives(hostname string) []string {
-	u, _ := tld.Parse("https://" + hostname)
 	subdomainAlternatives := GenerateAllAlternatives(Subdomains)
 
 	for i, alt := range subdomainAlternatives {
-		subdomainAlternatives[i] = fmt.Sprintf(alt, u.Domain+"."+u.TLD)
+		u, _ := tld.Parse("https://" + hostname)
+		newUrl := alt + "." + u.Domain
+		if u.TLD != "" {
+			newUrl += "." + u.TLD
+		}
+
+		subdomainAlternatives[i] = newUrl
 	}
 
 	return subdomainAlternatives

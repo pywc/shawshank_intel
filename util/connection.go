@@ -48,11 +48,32 @@ func ConnectViaProxy(addr string, port int, connectType string) (net.Conn, error
 		// Create a connection to the proxy server
 		proxyConn, err := net.Dial("tcp", ParseProxy())
 		if err != nil {
-			PrintError(config.ProxyIP, "", err)
+			PrintError("", err)
 			return nil, err
 		}
 
 		if connectType != "https" {
+			req := "GET http://" + config.EchoServerAddr + " HTTP/1.1\r\n" +
+				"Host: " + config.EchoServerAddr + "\r\n" +
+				"Accept: */*\r\n" +
+				"User-Agent: " + config.UserAgent + "\r\n"
+			if config.ProxyUsername != "" {
+				req += "Proxy-Authorization: Basic " + ParseAuth() + "\r\n"
+			}
+			req += "\r\n"
+
+			resp, err := SendHTTPTraffic(proxyConn, req)
+			if err != nil {
+				PrintError(addr, err)
+				return nil, err
+			}
+
+			if resp.StatusCode != 200 {
+				err := errors.New("proxy returned invalid response")
+				PrintError(addr, err)
+				return nil, err
+			}
+
 			return proxyConn, nil
 		}
 
@@ -60,7 +81,7 @@ func ConnectViaProxy(addr string, port int, connectType string) (net.Conn, error
 		req := ""
 
 		if config.ProxyUsername != "" {
-			req = "CONNECT " + addr + " HTTP/1.1\r\n" +
+			req = "CONNECT " + addr + ":" + strconv.Itoa(port) + " HTTP/1.1\r\n" +
 				"Host: " + addr + ":" + strconv.Itoa(port) + "\r\n" +
 				"Proxy-Authorization: Basic " + ParseAuth() + "\r\n" +
 				"Proxy-Connection: keep-alive\r\n" +
@@ -75,36 +96,45 @@ func ConnectViaProxy(addr string, port int, connectType string) (net.Conn, error
 		}
 
 		if err != nil {
-			PrintError(config.ProxyIP, "", err)
+			PrintError("", err)
 			return nil, err
 		}
 
 		// Read the proxy server's response
-		response := make([]byte, 4096)
-		_, err = proxyConn.Read(response)
+		resp, err := http.ReadResponse(bufio.NewReader(proxyConn), nil)
 		if err != nil {
-			PrintError(config.ProxyIP, "", err)
+			PrintError("", err)
+			return nil, err
+		}
+
+		if resp.StatusCode == 407 {
+			err := errors.New("incorrect proxy credentials")
+			PrintError(addr, err)
+			return nil, err
+		} else if resp.StatusCode != 200 {
+			err := errors.New("failed to connect to proxy via https")
+			PrintError(addr, err)
 			return nil, err
 		}
 
 		return proxyConn, nil
 	}
 
-	return nil, errors.New("unknown proxy type")
+	err := errors.New("unknown proxy type")
+	PrintError(addr, err)
+	return nil, err
 }
 
 // SendHTTPTraffic Send HTTP GET request and get response
 func SendHTTPTraffic(conn net.Conn, request string) (*http.Response, error) {
 	_, err := conn.Write([]byte(request))
 	if err != nil {
-		fmt.Println("Failed to send HTTP request:", err)
 		return nil, err
 	}
 
 	// Read the response
 	response, err := http.ReadResponse(bufio.NewReader(conn), nil)
 	if err != nil {
-		fmt.Println("Failed to read response")
 		return nil, err
 	}
 
@@ -129,6 +159,7 @@ func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config,
 	// Perform the TLS handshake
 	err := tlsConn.Handshake()
 	if err != nil {
+		PrintError(conn.RemoteAddr().String(), err)
 		return nil, err
 	}
 
@@ -137,12 +168,14 @@ func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config,
 
 	_, err = tlsConn.Write([]byte(request))
 	if err != nil {
+		PrintError(conn.RemoteAddr().String(), err)
 		return nil, err
 	}
 
 	// Read the response
 	response, err := http.ReadResponse(bufio.NewReader(tlsConn), nil)
 	if err != nil {
+		PrintError(conn.RemoteAddr().String(), err)
 		return nil, err
 	}
 
