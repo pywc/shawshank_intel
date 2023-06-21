@@ -53,7 +53,8 @@ func CheckHTMLTokens(domain string) ([]FilteredHTTP, error) {
 		}
 		req += "\r\n"
 		req += reqBody
-		resultCode, resp, redirectURL, err := SendHTTPRequest(config.EchoServerAddr, config.EchoServerAddr, config.EchoServerPort, req)
+		resultCode, resp, redirectURL, err := SendHTTPRequest(config.EchoServerAddr,
+			config.EchoServerAddr, config.EchoServerPort, req, "")
 		if resultCode == -10 {
 			log.Println("[*] Error - " + domain + " - " + err.Error())
 		}

@@ -35,34 +35,9 @@ type FilteredHTTP struct {
 	4xx: not accessible
 	5xx: internal server error
 */
-func SendHTTPRequest(domain string, ip string, port int, req string) (int, string, string, error) {
-	// Fetch Normally
-	conn, err := util.ConnectNormally(ip, port)
-	if err != nil {
-		// echo server is not functional
-		if ip == config.EchoServerAddr {
-			return -9, "", "", nil
-		}
-
-		// IP is not accessible from the US
-		util.PrintError(domain, err)
-		return -2, "", "", err
-	}
-
-	reqNormal := "GET / HTTP/1.1\r\n" +
-		"Host: " + domain + "\r\n" +
-		"Accept: */*\r\n" +
-		"User-Agent: " + config.UserAgent + "\r\n\r\n"
-
-	resp, err := util.SendHTTPTraffic(conn, reqNormal)
-	conn.Close()
-	if err != nil {
-		util.PrintError(domain, err)
-		return -3, "", "", err
-	}
-
+func SendHTTPRequest(domain string, ip string, port int, req string, redirectHost string) (int, string, string, error) {
 	// Fetch via proxy
-	conn, err = util.ConnectViaProxy(ip, port, "http")
+	conn, err := util.ConnectViaProxy(ip, port, "http")
 	if err != nil {
 		if strings.Contains(err.Error(), "general SOCKS server failure") {
 			// cannot connect to proxy
@@ -77,7 +52,7 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 		}
 	}
 
-	resp, err = util.SendHTTPTraffic(conn, req)
+	resp, err := util.SendHTTPTraffic(conn, req)
 
 	// check tcp errors
 	if err != nil {
@@ -120,16 +95,12 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 				return resultCode, string(respBody), "unknown", nil
 			}
 
-			urlOriginal, err := tld.Parse("http://" + domain)
-			if err != nil {
-				util.PrintError(domain, err)
-				return resultCode, string(respBody), "unknown", nil
+			similarity := strutil.Similarity(redirectHost, urlCompare.Host, metrics.NewHamming())
+			if similarity < 1 {
+				util.PrintInfo(domain, "redirection: similarity between \""+
+					redirectHost+"\" and \""+urlCompare.Host+"\" is "+
+					strconv.FormatFloat(similarity, 'f', -1, 64))
 			}
-
-			similarity := strutil.Similarity(urlOriginal.Domain, urlCompare.Domain, metrics.NewHamming())
-			util.PrintInfo(domain, "redirection: similarity between \""+
-				urlOriginal.Domain+"\" and \""+urlCompare.Domain+"\" is "+
-				strconv.FormatFloat(similarity, 'f', -1, 64))
 
 			if similarity < config.DomainSimilarityThreshold {
 				return resultCode, string(respBody), redirectURL[0], nil
@@ -138,4 +109,57 @@ func SendHTTPRequest(domain string, ip string, port int, req string) (int, strin
 	}
 
 	return 0, string(respBody), "", nil
+}
+
+func SendHTTPRequestNormally(domain string, ip string, port int) (int, string, error) {
+	// Fetch Normally
+	conn, err := util.ConnectNormally(ip, port)
+	if err != nil {
+		// echo server is not functional
+		if ip == config.EchoServerAddr {
+			return -9, "", nil
+		}
+
+		// IP is not accessible from the US
+		util.PrintError(domain, err)
+		return -2, "", err
+	}
+
+	reqNormal := "GET / HTTP/1.1\r\n" +
+		"Host: " + domain + "\r\n" +
+		"Accept: */*\r\n" +
+		"User-Agent: " + config.UserAgent + "\r\n\r\n"
+
+	resp, err := util.SendHTTPTraffic(conn, reqNormal)
+	conn.Close()
+	if err != nil {
+		util.PrintError(domain, err)
+		return -3, "", err
+	}
+
+	resultCode := resp.StatusCode
+	respHeader := resp.Header
+	resp.Body.Close()
+	conn.Close()
+
+	if resultCode >= 400 {
+		// cloudflare server down
+		return -3, "", nil
+	} else if resultCode >= 300 {
+		// check redirection
+		redirectURL := respHeader["Location"]
+		if len(redirectURL) < 1 {
+			return resultCode, "unknown", nil
+		} else if redirectURL[0] != "" {
+			urlRedirect, err := tld.Parse(redirectURL[0])
+			if err != nil {
+				util.PrintError(domain, err)
+				return resultCode, "unknown", nil
+			}
+
+			return resultCode, urlRedirect.Host, nil
+		}
+	}
+
+	return 0, "", nil
 }

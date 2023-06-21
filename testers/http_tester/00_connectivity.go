@@ -13,6 +13,21 @@ type HTTPConnectivityResult struct {
 
 // CheckHTTPConnectivity Check basic HTTP connectivity to the domain
 func CheckHTTPConnectivity(domain string, ip string) HTTPConnectivityResult {
+	resultCode, redirectHost, err := SendHTTPRequestNormally(domain, ip, 80)
+	if err != nil {
+		util.PrintError(domain, err)
+
+		return HTTPConnectivityResult{
+			ResultCode:  resultCode,
+			RedirectURL: redirectHost,
+		}
+	} else if resultCode >= 400 {
+		return HTTPConnectivityResult{
+			ResultCode:  -3,
+			RedirectURL: redirectHost,
+		}
+	}
+
 	req := "GET / HTTP/1.1\r\n" +
 		"Host: " + domain + "\r\n" +
 		"Accept: */*\r\n" +
@@ -29,7 +44,7 @@ func CheckHTTPConnectivity(domain string, ip string) HTTPConnectivityResult {
 
 	req += "\r\n"
 
-	resultCode, _, redirectURL, err := SendHTTPRequest(domain, ip, 80, req)
+	resultCode, _, redirectURL, err := SendHTTPRequest(domain, ip, 80, req, redirectHost)
 	if resultCode == -10 {
 		util.PrintError(domain, err)
 	}

@@ -61,7 +61,8 @@ func CheckHTMLTitle(domain string) []FilteredHTTP {
 	}
 	req += "\r\n"
 	req += reqBody
-	resultCode, respEcho, redirectURL, err := SendHTTPRequest(config.EchoServerAddr, config.EchoServerAddr, config.EchoServerPort, req)
+	resultCode, respEcho, redirectURL, err := SendHTTPRequest(config.EchoServerAddr,
+		config.EchoServerAddr, config.EchoServerPort, req, "")
 	if resultCode == -10 {
 		log.Println("[*] Error - " + domain + " - " + err.Error())
 	}
