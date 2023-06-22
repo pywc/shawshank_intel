@@ -112,7 +112,7 @@ func ConnectViaProxy(addr string, port int, connectType string) (net.Conn, error
 			PrintError(addr, err)
 			return nil, err
 		} else if resp.StatusCode != 200 {
-			err := errors.New("failed to connect to proxy via https")
+			err := errors.New("failed to connect to proxy via https, HTTP " + strconv.Itoa(resp.StatusCode))
 			PrintError(addr, err)
 			return nil, err
 		}

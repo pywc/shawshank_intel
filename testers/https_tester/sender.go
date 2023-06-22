@@ -5,6 +5,7 @@ import (
 	"github.com/pywc/shawshank_intel/util"
 	utls "github.com/refraction-networking/utls"
 	"io"
+	"strconv"
 	"strings"
 )
 
@@ -41,6 +42,8 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 			if err != nil {
 				return -10, "", err
 			}
+		} else if strings.Contains(err.Error(), "HTTP 502") {
+			return 502, "", err
 		} else {
 			// unknown error
 			return -10, "", err
@@ -67,6 +70,7 @@ func SendHTTPSRequest(domain string, ip string, port int, req string, utlsConfig
 		}
 	}
 
+	util.PrintInfo(domain, "http response "+strconv.Itoa(resp.StatusCode))
 	respBody, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
 	conn.Close()
