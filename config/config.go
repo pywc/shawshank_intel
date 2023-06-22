@@ -1,10 +1,14 @@
 package config
 
-import "regexp"
+import (
+	"regexp"
+	"time"
+)
 
 // Global Configuration
 var TestCount = 30
 var CurrentComponent = ""
+var Timeout = time.Second * 20
 
 // SOCKS5 Proxy Configuration
 var ProxyIP = "35.188.143.33"

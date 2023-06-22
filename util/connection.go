@@ -17,7 +17,8 @@ import (
 // ConnectNormally Connect to the address normally
 func ConnectNormally(addr string, port int) (net.Conn, error) {
 	// Connect to the SOCKS5 proxy
-	conn, err := net.Dial("tcp", net.JoinHostPort(addr, strconv.Itoa(port)))
+	dialer := net.Dialer{Timeout: config.Timeout}
+	conn, err := dialer.Dial("tcp", net.JoinHostPort(addr, strconv.Itoa(port)))
 	if err != nil {
 		fmt.Println("Failed to normally connect:", err)
 		return nil, err
@@ -30,7 +31,8 @@ func ConnectNormally(addr string, port int) (net.Conn, error) {
 func ConnectViaProxy(addr string, port int, connectType string) (net.Conn, error) {
 	if config.ProxyType == "socks5" {
 		// Create a SOCKS5 proxy dialer
-		dialer, err := proxy.SOCKS5("tcp", ParseProxy(), nil, proxy.Direct)
+		dialerOrig := net.Dialer{Timeout: config.Timeout}
+		dialer, err := proxy.SOCKS5("tcp", ParseProxy(), nil, &dialerOrig)
 		if err != nil {
 			fmt.Println("Failed to create proxy dialer:", err)
 			return nil, err

@@ -62,7 +62,7 @@ func SendHTTPRequest(domain string, ip string, port int, req string, redirectHos
 		} else if strings.Contains(err.Error(), "connection refused") {
 			// connection refused
 			return 2, "", "", nil
-		} else if strings.Contains(err.Error(), "i/o timeout") {
+		} else if strings.Contains(err.Error(), "timeout") {
 			// connection timeout
 			return 3, "", "", nil
 		} else {
