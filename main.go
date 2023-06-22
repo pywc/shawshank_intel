@@ -50,12 +50,18 @@ func main() {
 		}
 
 		// Fisher–Yates shuffle
-		log.Println("testing only " + strconv.Itoa(config.TestCount) + " domains")
 		for i := len(testList) - 1; i > 0; i-- {
 			j := rand.Intn(i + 1)
 			testList[i], testList[j] = testList[j], testList[i]
 		}
-		testList = testList[:30]
+
+		if len(testList) < config.TestCount {
+			log.Println("testing only " + strconv.Itoa(len(testList)) + " domains")
+			testList = testList[:len(testList)]
+		} else {
+			log.Println("testing only " + strconv.Itoa(config.TestCount) + " domains")
+			testList = testList[:30]
+		}
 
 		// test for each domain
 		for _, domain := range testList {

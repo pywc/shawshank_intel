@@ -32,15 +32,22 @@ type Response struct {
 }
 
 func FetchISP() error {
-	conn, err := ConnectViaProxy("lumtest.com", 80, "http")
+	conn, err := ConnectViaProxy("3.94.72.89", 80, "http")
 
-	req := "GET http://lumtest.com/myip.json HTTP/1.1\r\n" +
+	req := "GET /myip.json HTTP/1.1\r\n" +
 		"Host: lumtest.com\r\n" +
 		"Accept: */*\r\n" +
 		"User-Agent: " + config.UserAgent + "\r\n"
-	if config.ProxyUsername != "" {
-		req += "Proxy-Authorization: Basic " + ParseAuth() + "\r\n"
+	if config.ProxyType == "https" {
+		req = "GET http://lumtest.com/myip.json HTTP/1.1\r\n" +
+			"Host: lumtest.com\r\n" +
+			"Accept: */*\r\n" +
+			"User-Agent: " + config.UserAgent + "\r\n"
+		if config.ProxyUsername != "" {
+			req += "Proxy-Authorization: Basic " + ParseAuth() + "\r\n"
+		}
 	}
+
 	req += "\r\n"
 
 	resp, err := SendHTTPTraffic(conn, req)

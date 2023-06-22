@@ -27,7 +27,7 @@ func TestHTTPS(ip string, domain string) HTTPSResult {
 
 	result := HTTPSResult{}
 	result.Connectivity = CheckHTTPSConnectivity(domain, ip)
-	if result.Connectivity <= 0 {
+	if result.Connectivity <= 0 || result.Connectivity == 502 {
 		return result
 	}
 

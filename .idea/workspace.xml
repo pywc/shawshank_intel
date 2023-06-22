@@ -5,16 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c13604d1-2d2d-46a4-9c22-2736e5944578" name="Changes" comment="Resolved circular dependency">
+      <change afterPath="$PROJECT_DIR$/.ipynb_checkpoints/Untitled-checkpoint.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Untitled.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/isp_ips.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/00_connectivity.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/01_header_host.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/02_html_title.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/02_html_title.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/03_html_tokens.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/04_cenfuzz.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/http_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/sender.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testers/http_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/http_tester/tester.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/00_connectivity.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testers/https_tester/sender.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/sender.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/https_tester/tester.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/https_tester/tester.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testers/ip_tester/00_port.go" beforeDir="false" afterPath="$PROJECT_DIR$/testers/ip_tester/00_port.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/connection.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/connection.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/geolocator.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/geolocator.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,30 +50,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "DefaultGoTemplateProperty": "Go File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
-    "go.import.settings.migrated": "true",
-    "last_opened_file_path": "/Users/pywchung/go/Shawshank/testers/ip_tester",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "go.vgo"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/pywchung/go/Shawshank/testers/ip_tester&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;go.vgo&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "go"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;go&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/testers/ip_tester" />

@@ -127,6 +127,10 @@ func ConnectViaProxy(addr string, port int, connectType string) (net.Conn, error
 
 // SendHTTPTraffic Send HTTP GET request and get response
 func SendHTTPTraffic(conn net.Conn, request string) (*http.Response, error) {
+	if conn == nil {
+		return nil, errors.New("conn is nil")
+	}
+
 	_, err := conn.Write([]byte(request))
 	if err != nil {
 		return nil, err
@@ -144,6 +148,10 @@ func SendHTTPTraffic(conn net.Conn, request string) (*http.Response, error) {
 // SendHTTPSTraffic Send HTTP GET request with TLS and get response
 func SendHTTPSTraffic(conn net.Conn, request string, utlsConfig *utls.Config,
 	extensions []utls.TLSExtension, chloID utls.ClientHelloID) (*http.Response, error) {
+	if conn == nil {
+		return nil, errors.New("conn is nil")
+	}
+
 	// Create a TLS connection over the proxy connection
 	tlsConn := utls.UClient(conn, utlsConfig, chloID)
 	tlsConn.BuildHandshakeState()
@@ -192,6 +200,10 @@ type TLSSession struct {
 
 // GetNewTLSSession
 func GetNewTLSSession(conn net.Conn, request string, utlsConfig *utls.Config) (*TLSSession, error) {
+	if conn == nil {
+		return nil, errors.New("conn is nil")
+	}
+
 	sess := TLSSession{}
 
 	// Create a TLS connection over the proxy connection
@@ -234,6 +246,10 @@ func GetNewTLSSession(conn net.Conn, request string, utlsConfig *utls.Config) (*
 
 // ResumeTLSSession
 func ResumeTLSSession(conn net.Conn, request string, sess TLSSession) (*http.Response, error) {
+	if conn == nil {
+		return nil, errors.New("conn is nil")
+	}
+
 	utlsConfig := utls.Config{
 		ServerName:         config.DummyServerDomain,
 		InsecureSkipVerify: true,

@@ -13,11 +13,14 @@ import (
 	"github.com/pywc/shawshank_intel/util"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"time"
 )
 
 type TestReport struct {
 	Country    string                   `json:"country"`
 	ProxyIP    string                   `json:"proxy_ip"`
+	ProxyISP   string                   `json:"proxy_isp"`
+	TestTime   string                   `json:"test_time"`
 	HostDomain string                   `json:"host_domain"`
 	HostIP     string                   `json:"host_ip"`
 	Residual   []util.ResidualDetected  `json:"residual,omitempty"`
@@ -35,6 +38,7 @@ func TestDomain(country string, domain string, ip string) {
 	report := TestReport{
 		Country:    country,
 		ProxyIP:    config.ProxyIP,
+		ProxyISP:   config.ProxyISP,
 		HostDomain: domain,
 		HostIP:     ip,
 		DNS:        dns_tester.TestDNS(ip, domain),
@@ -43,6 +47,7 @@ func TestDomain(country string, domain string, ip string) {
 		HTTPS:      https_tester.TestHTTPS(ip, domain),
 		QUIC:       quic_tester.TestQUIC(ip, domain),
 		Residual:   util.AllResidualDetected,
+		TestTime:   time.Now().String(),
 	}
 
 	err := saveToDB(report)
