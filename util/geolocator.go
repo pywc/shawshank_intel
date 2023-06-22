@@ -63,7 +63,7 @@ func FetchISP() error {
 		PrintError("", err)
 		return err
 	}
-	
+
 	resp.Body.Close()
 	conn.Close()
 

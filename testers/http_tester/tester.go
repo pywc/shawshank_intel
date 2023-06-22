@@ -35,7 +35,9 @@ func TestHTTP(ip string, domain string) HTTPResult {
 	result := HTTPResult{}
 
 	result.Connectivity = CheckHTTPConnectivity(domain, ip)
-	if result.Connectivity.ResultCode <= 0 || result.Connectivity.ResultCode == 502 {
+	if result.Connectivity.ResultCode <= 0 ||
+		result.Connectivity.ResultCode == 502 ||
+		result.Connectivity.ResultCode >= 520 {
 		return result
 	}
 
