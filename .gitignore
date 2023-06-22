@@ -25,3 +25,6 @@ go.work
 test.go
 sess.pem
 proxies.csv
+isp_ips.csv
+isp_ips.csv
+*.ipynb
