@@ -51,9 +51,19 @@ func FetchISP() error {
 	req += "\r\n"
 
 	resp, err := SendHTTPTraffic(conn, req)
+	if err != nil {
+		PrintError("", err)
+		return err
+	}
+
 	var response Response
 
 	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		PrintError("", err)
+		return err
+	}
+	
 	resp.Body.Close()
 	conn.Close()
 
